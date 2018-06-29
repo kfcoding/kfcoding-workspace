@@ -10,7 +10,15 @@ import {Store} from "./store";
 
 const store = Store.create(
   {
-    terminals: []
+    terminals: [],
+    files: [{
+      name: 'aaa',
+      path: '/aaa',
+      size: 123,
+      isDir: false,
+      type: 'text',
+      children: []
+    }]
   }
 );
 
