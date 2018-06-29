@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import SplitPane from 'react-split-pane';
 
 import './App.css';
@@ -6,34 +6,23 @@ import Header from './Header';
 import MonacoEditor from './MonacoEditor';
 import FileTree from './FileTree';
 import Bottom from './Bottom';
+import { inject, observer } from "mobx-react/index";
 
-class App extends Component {
+const editorOptions = {
+  selectOnLineNumbers: true
+};
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      code: '// type your code...',
-    }
-  }
-
-  onDragStarted = () => {
-      console.log(arguments)
-  }
-
-
-  render() {
-    const options = {
-      selectOnLineNumbers: true
-    };
-
-    return (
-      <div className="App">
-        <Header/>
-        <div style={{height: 'calc(100% - 40px'}}>
+const App = inject('store')(
+  observer(() => (
+    <div className="App">
+      <Header/>
+      <div style={{height: 'calc(100% - 40px'}}>
         <SplitPane
           split='horizontal'
-          defaultSize={600}
+          defaultSize={200}
           style={{position: 'relative'}}
+          primary="second"
+          onDragFinished={this.onDragFinished}
         >
           <SplitPane
             defaultSize={256}
@@ -41,14 +30,13 @@ class App extends Component {
             pane2Style={{overflow: 'hidden'}}
           >
             <FileTree/>
-            <MonacoEditor value={this.state.code} options={options}/>
+            <MonacoEditor value="// coding" options={editorOptions}/>
           </SplitPane>
           <Bottom/>
         </SplitPane>
-        </div>
       </div>
-    );
-  }
-}
+    </div>
+  ))
+);
 
 export default App;

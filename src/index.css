@@ -27,7 +27,7 @@ html, body {
 }
 
 .Resizer.horizontal {
-  height: 11px;
+  height: 15px;
   margin: -5px 0;
   border-top: 5px solid rgba(0, 0, 0, 0);
   border-bottom: 5px solid rgba(0, 0, 0, 0);
@@ -41,7 +41,7 @@ html, body {
 }
 
 .Resizer.vertical {
-  width: 11px;
+  width: 15px;
   margin: 0 -5px;
   border-left: 5px solid rgba(0, 0, 0, 0);
   border-right: 5px solid rgba(0, 0, 0, 0);
@@ -51,4 +51,57 @@ html, body {
 .Resizer.vertical:hover {
   border-left: 5px solid rgba(0, 0, 0, 0.5);
   border-right: 5px solid rgba(0, 0, 0, 0.5);
+}
+
+.react-tabs__tab-list {
+  border-bottom: 1px solid #aaa;
+  margin: 0;
+  padding: 0;
+}
+
+.react-tabs__tab {
+  display: inline-block;
+  border: 1px solid transparent;
+  border-bottom: none;
+  bottom: -1px;
+  position: relative;
+  list-style: none;
+  padding: 3px 4px 3px 12px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.react-tabs__tab--selected {
+  background: #222;
+  border-color: #aaa;
+  color: #fff;
+}
+
+.react-tabs__tab--disabled {
+  color: GrayText;
+  cursor: default;
+}
+
+.react-tabs__tab:focus {
+  box-shadow: 0 0 5px hsl(208, 99%, 50%);
+  border-color: hsl(208, 99%, 50%);
+  outline: none;
+}
+
+.react-tabs__tab:focus:after {
+  content: "";
+  position: absolute;
+  height: 5px;
+  left: -4px;
+  right: -4px;
+  bottom: -5px;
+  background: #fff;
+}
+
+.react-tabs__tab-panel {
+  display: none;
+}
+
+.react-tabs__tab-panel--selected {
+  display: block;
 }
