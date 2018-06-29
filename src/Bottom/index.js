@@ -1,6 +1,5 @@
 import React from 'react';
 import Term from "./Term";
-import {values} from 'mobx';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { observer, inject } from "mobx-react"
 import IconClose from 'react-icons/lib/md/close';
@@ -14,7 +13,7 @@ const Bottom = inject('store')(
           {store.terminals.map(t => <Tab key={t}>{t.name} <IconClose style={{marginLeft: '10px'}} onClick={(e) => {store.removeTerminal(t);e.stopPropagation()}}/></Tab>)}
           <IconPlus onClick={store.createTerminal} style={{marginLeft: 10, cursor: 'pointer'}}/>
         </TabList>
-        {store.terminals.map(t => <TabPanel key={t} style={{height: 'calc(100% - 50px)'}}><Term terminal={t}/></TabPanel>)}
+        {store.terminals.map(t => <TabPanel key={t} style={{height: 'calc(100% - 25px)', background: '#000'}}><Term terminal={t}/></TabPanel>)}
       </Tabs>
     </div>
   ))
