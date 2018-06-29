@@ -1,7 +1,15 @@
-import React, { Component } from 'react';
-import SortableTree, { toggleExpandedForAll } from 'react-sortable-tree';
+import React, {Component} from 'react';
+import SortableTree, {toggleExpandedForAll} from 'react-sortable-tree';
 import * as FileExplorerTheme from 'react-sortable-tree-theme-file-explorer';
+import folder from '../asset/fold/folder.png'
+import folderopen from '../asset/fold/folderopen.png'
+import { ContextMenu, MenuItem, ContextMenuTrigger } from "react-contextmenu";
+import file from '../asset/fold/file.png'
 import './index.css';
+
+function handleClick(e, data) {
+  console.log(data.foo);
+}
 
 
 class FileTree extends Component {
@@ -9,36 +17,36 @@ class FileTree extends Component {
     super(props);
 
     this.state = {
+      visible: false,
       searchString: '',
       searchFocusIndex: 0,
       searchFoundCount: null,
+      displayMenu: false,
       treeData: [
-        { title: '.gitignore' },
-        { title: 'package.json' },
         {
           title: 'src',
           isDirectory: true,
           expanded: true,
           children: [
-            { title: 'styles.css' },
-            { title: 'index.js' },
-            { title: 'reducers.js' },
-            { title: 'actions.js' },
-            { title: 'utils.js' },
+            {title: 'styles.css'},
+            {title: 'index.js'},
+            {title: 'reducers.js'},
+            {title: 'actions.js'},
+            {title: 'utils.js'},
           ],
         },
         {
           title: 'tmp',
           isDirectory: true,
           children: [
-            { title: '12214124-log' },
-            { title: 'drag-disabled-file', dragDisabled: true },
+            {title: '12214124-log'},
+            {title: 'drag-disabled-file', dragDisabled: true},
           ],
         },
         {
           title: 'build',
           isDirectory: true,
-          children: [{ title: 'react-sortable-tree.js' }],
+          children: [{title: 'react-sortable-tree.js'}],
         },
         {
           title: 'public',
@@ -48,6 +56,8 @@ class FileTree extends Component {
           title: 'node_modules',
           isDirectory: true,
         },
+        {title: '.gitignore'},
+        {title: 'package.json'},
       ],
     };
 
@@ -57,7 +67,7 @@ class FileTree extends Component {
   }
 
   updateTreeData(treeData) {
-    this.setState({ treeData });
+    this.setState({treeData});
   }
 
   expand(expanded) {
@@ -79,23 +89,18 @@ class FileTree extends Component {
 
   render() {
     const {
+      visible,
       treeData,
       searchString,
       searchFocusIndex,
       searchFoundCount,
     } = this.state;
 
-    const alertNodeInfo = ({ node, path, treeIndex }) => {
+    const alertNodeInfo = ({node, path, treeIndex}) => {
       const objectString = Object.keys(node)
         .map(k => (k === 'children' ? 'children: Array' : `${k}: '${node[k]}'`))
         .join(',\n   ');
-
-      global.alert(
-        'Info passed to the icon and button generators:\n\n' +
-        `node: {\n   ${objectString}\n},\n` +
-        `path: [${path.join(', ')}],\n` +
-        `treeIndex: ${treeIndex}`
-      );
+      global.alert("show")
     };
 
     const selectPrevMatch = () =>
@@ -114,58 +119,32 @@ class FileTree extends Component {
             : 0,
       });
 
+    const foldImg = (expanded) => {
+      if (expanded){
+        return (<img style={{width: '25px', height: '25px', borderColor: '#fff', paddingRight: '10px'}} src={folderopen}/>)
+      } else {
+        return(<img style={{width: '25px', height: '25px', borderColor: '#fff', paddingRight: '10px'}} src={folder}/>);
+      }
+    }
+
+
     return (
       <div
-        style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100vh',
+          background: '#364040',
+          height: '100%',
+          color: '#fff'
+        }}
       >
-        <div style={{ flex: '0 0 auto', padding: '0 15px' }}>
-          <h3>File Explorer Theme</h3>
-          <button onClick={this.expandAll}>Expand All</button>
-          <button onClick={this.collapseAll}>Collapse All</button>
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          <form
-            style={{ display: 'inline-block' }}
-            onSubmit={event => {
-              event.preventDefault();
-            }}
-          >
-            <label htmlFor="find-box">
-              Search:&nbsp;
-              <input
-                id="find-box"
-                type="text"
-                value={searchString}
-                onChange={event =>
-                  this.setState({ searchString: event.target.value })}
-              />
-            </label>
+        {/*<div style={{flex: '0 0 auto', padding: '0 15px', borderBottom: '1px solid #aaa'}}>*/}
+          {/*{foldAll({isExpendAll})}*/}
+          {/*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*/}
+        {/*</div>*/}
 
-            <button
-              type="button"
-              disabled={!searchFoundCount}
-              onClick={selectPrevMatch}
-            >
-              &lt;
-            </button>
-
-            <button
-              type="submit"
-              disabled={!searchFoundCount}
-              onClick={selectNextMatch}
-            >
-              &gt;
-            </button>
-
-            <span>
-              &nbsp;
-              {searchFoundCount > 0 ? searchFocusIndex + 1 : 0}
-              &nbsp;/&nbsp;
-              {searchFoundCount || 0}
-            </span>
-          </form>
-        </div>
-
-        <div style={{ flex: '1 0 50%', padding: '0 0 0 15px' }}>
+        <div style={{flex: '1 0 50%', padding: '0 0 0 15px'}}>
           <SortableTree
             theme={FileExplorerTheme}
             treeData={treeData}
@@ -178,58 +157,59 @@ class FileTree extends Component {
                 searchFocusIndex:
                   matches.length > 0 ? searchFocusIndex % matches.length : 0,
               })}
-            canDrag={({ node }) => !node.dragDisabled}
-            canDrop={({ nextParent }) => !nextParent || nextParent.isDirectory}
+            canDrag={({node}) => !node.dragDisabled}
+            canDrop={({nextParent}) => !nextParent || nextParent.isDirectory}
             generateNodeProps={rowInfo => ({
               icons: rowInfo.node.isDirectory
                 ? [
-                  <div
-                    style={{
-                      borderLeft: 'solid 8px gray',
-                      borderBottom: 'solid 10px gray',
-                      marginRight: 10,
-                      width: 16,
-                      height: 12,
-                      filter: rowInfo.node.expanded
-                        ? 'drop-shadow(1px 0 0 gray) drop-shadow(0 1px 0 gray) drop-shadow(0 -1px 0 gray) drop-shadow(-1px 0 0 gray)'
-                        : 'none',
-                      borderColor: rowInfo.node.expanded ? 'white' : 'gray',
-                    }}
-                  />,
+                  foldImg(rowInfo.node.expanded)
                 ]
                 : [
-                  <div
+                  <img
                     style={{
-                      border: 'solid 1px black',
-                      fontSize: 8,
                       textAlign: 'center',
                       marginRight: 10,
-                      width: 12,
-                      height: 16,
+                      width: '25px',
+                      height: '25px',
                     }}
+                    src={file}
                   >
-                    F
-                  </div>,
+                  </img>,
                 ],
               buttons: [
-                <button
-                  style={{
-                    padding: 0,
-                    borderRadius: '100%',
-                    backgroundColor: 'gray',
-                    color: 'white',
-                    width: 16,
-                    height: 16,
-                    border: 0,
-                    fontWeight: 100,
-                  }}
-                  onClick={() => alertNodeInfo(rowInfo)}
-                >
-                  i
-                </button>,
+                  <button
+                    style={{
+                      padding: 0,
+                      borderRadius: '100%',
+                      backgroundColor: 'gray',
+                      color: 'white',
+                      width: 16,
+                      height: 16,
+                      border: 0,
+                      fontWeight: 100,
+                    }}
+                    // onClick={() => alertNodeInfo(rowInfo)}
+                  >
+                    <ContextMenuTrigger id="some_unique_identifier">
+                      <div className="well">Right click to see the menu</div>
+                    </ContextMenuTrigger>
+                  </button>
+                ,
               ],
             })}
           />
+          <ContextMenu id="some_unique_identifier">
+            <MenuItem data={{foo: 'bar'}} onClick={this.handleClick}>
+              ContextMenu Item 1
+            </MenuItem>
+            <MenuItem data={{foo: 'bar'}} onClick={this.handleClick}>
+              ContextMenu Item 2
+            </MenuItem>
+            <MenuItem divider />
+            <MenuItem data={{foo: 'bar'}} onClick={this.handleClick}>
+              ContextMenu Item 3
+            </MenuItem>
+          </ContextMenu>
         </div>
       </div>
     );
