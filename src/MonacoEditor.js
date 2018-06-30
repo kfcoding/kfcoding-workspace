@@ -7,6 +7,11 @@ const Div = measure('div');
 class MonacoEditor extends React.PureComponent {
   constructor(props) {
     super(props);
+
+    this.state = {
+      code: props.value || '// insert your code'
+    }
+
     this.dom = React.createRef();
     this.editor = null;
   }
@@ -15,14 +20,22 @@ class MonacoEditor extends React.PureComponent {
     console.log('editorDidMount', editor);
     editor.focus();
   }
+
   onChange = (newValue, e) => {
     console.log('onChange', newValue, e);
-    this.setState({code: newValue})
+    this.setState({code: newValue});
+  }
+
+  componentWillReceiveProps(next) {
+    if (next.value) {
+      this.setState({code: next.value});
+      this.editor.setValue(next.value);
+    }
   }
 
   componentDidMount() {
     this.editor = monaco.editor.create(this.dom, {
-      value: this.props.value,
+      value: this.state.code,
       language: 'javascript',
       theme: 'vs-dark'
     });

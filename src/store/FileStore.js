@@ -1,14 +1,14 @@
 import { types, getParent, flow } from 'mobx-state-tree';
 
-const File = types
+export const File = types
   .model('File', {
     name: types.string,
     isDir: types.boolean,
     type: types.string,
     size: types.number,
-    path: types.string,
+    path: types.identifier(),
     children: types.late(() => types.array(File)),
-    content: ''
+    content: '1233'
   }).views(self => ({
     get store() {
       return getParent(self, 2);

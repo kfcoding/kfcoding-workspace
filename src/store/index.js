@@ -3,7 +3,7 @@ import { Terminal as Xterm } from 'xterm';
 import io from 'socket.io-client';
 import * as fit from "xterm/lib/addons/fit/fit";
 import { ViewStore } from "./ViewStore";
-import { FileStore } from "./FileStore";
+import { File, FileStore } from "./FileStore";
 
 Xterm.applyAddon(fit);
 
@@ -52,7 +52,8 @@ export const Store = types
     terminals: types.array(Terminal),
     fileStore: types.optional(FileStore, {
       files: []
-    })
+    }),
+    openedFiles: types.array(types.reference(File))
   }).volatile(self => ({
     socket: null
   })).views(self => ({
@@ -73,9 +74,9 @@ export const Store = types
       /** fetch files **/
       socket.on('connect', () => {
         self.fileStore.loadFiles()
-        setTimeout(() => {
-          self.fileStore.readfile(self.files[12])
-        }, 1000)
+        // setTimeout(() => {
+        //   self.fileStore.readfile(self.files[12])
+        // }, 1000)
       })
     }
 
@@ -99,9 +100,25 @@ export const Store = types
       self.terminals.remove(term);
     }
 
+    function openFile(file) {
+      self.openedFiles.push(file);
+      self.fileStore.readfile(file);
+    }
+
+    function closeFile(file) {
+      let idx = self.openedFiles.findIndex(item => item === file);
+      if (idx <= self.view.editorIndex) {
+        self.view.editorIndex--;
+      }
+
+      self.openedFiles.remove(file);
+    }
+
     return {
       afterCreate,
       createTerminal,
-      removeTerminal
+      removeTerminal,
+      openFile,
+      closeFile
     }
   });

@@ -18,7 +18,8 @@ const store = Store.create(
       isDir: false,
       type: 'text',
       children: []
-    }]
+    }],
+    openedFiles: []
   }
 );
 
