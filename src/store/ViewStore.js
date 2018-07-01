@@ -1,4 +1,5 @@
 import { types, getParent } from 'mobx-state-tree';
+import { File } from "./FileStore";
 
 export const ViewStore = types
   .model({
@@ -6,7 +7,8 @@ export const ViewStore = types
     editorIndex: -1,
     loading: true,
     loadingMsg: 'Loading...',
-    bottomHeight: 30
+    bottomHeight: 30,
+    currentFilePath: ''
   }).actions(self => ({
     setTerminalIndex(idx) {
       self.terminalIndex = idx;
@@ -22,5 +24,8 @@ export const ViewStore = types
     },
     setBottomHeight(height) {
       self.bottomHeight = height;
+    },
+    setCurrentFilePath(path) {
+      self.currentFilePath = path;
     }
   }));

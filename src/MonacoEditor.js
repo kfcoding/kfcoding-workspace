@@ -12,6 +12,12 @@ class MonacoEditor extends React.PureComponent {
     this.editor = null;
   }
 
+  componentWillReceiveProps(next) {
+    if (next.file) {
+      this.editor.setValue(next.file.content)
+    }
+  }
+
   componentDidMount() {
     this.editor = monaco.editor.create(this.dom, {
       value: this.props.file.content,
@@ -38,7 +44,7 @@ class MonacoEditor extends React.PureComponent {
         style={{width: '100%', height: '100%'}}
         onWidthChange={this.handleResize}
       >
-        <div onChange={this.onChange} ref={dom => this.dom = dom} style={{width: '100%', height: '100%'}}></div>
+        <div ref={dom => this.dom = dom} style={{width: '100%', height: '100%'}}></div>
       </Div>
     );
   }
