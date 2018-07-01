@@ -4,6 +4,7 @@ import io from 'socket.io-client';
 import * as fit from "xterm/lib/addons/fit/fit";
 import { ViewStore } from "./ViewStore";
 import { File, FileStore } from "./FileStore";
+import { getQueryString } from '../utils/common'
 
 Xterm.applyAddon(fit);
 
@@ -64,7 +65,7 @@ export const Store = types
     }
   })).actions(self => {
     function afterCreate() {
-
+      console.log(getQueryString('id'));
       self.view.setLoadingMsg('Connecting server...');
       /** connect socket **/
       let socket = io('http://localhost:16999');

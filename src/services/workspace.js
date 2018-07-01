@@ -10,3 +10,7 @@ export function createWorkSpace(data) {
     body: JSON.stringify(data)
   });
 }
+
+export function getWorkSpace(id) {
+  return request(API + '/workspace/'+id);
+}
