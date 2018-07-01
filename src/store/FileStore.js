@@ -1,4 +1,4 @@
-import { types, getParent, flow } from 'mobx-state-tree';
+import { types, getParent, getRoot, hasParentOfType } from 'mobx-state-tree';
 
 export const File = types
   .model('File', {
@@ -9,19 +9,20 @@ export const File = types
     path: types.identifier(),
     children: types.late(() => types.array(File)),
     content: '',
-    dirty: false
+    dirty: false,
+    expanded: false
   }).views(self => ({
     get store() {
-      return getParent(self, 2);
+      return getRoot(self);
+    },
+    get depth() {
+      if (!hasParentOfType(self, File)) {
+        return 0;
+      } else {
+        return getParent(self, 2).depth + 1;
+      }
     }
   })).actions(self => {
-
-    function loadWorkspace() {
-      self.store.socket.emit('fs.readdir', {path: '/tmp'}, data => {
-        console.log(data)
-        self.files = data;
-      })
-    }
 
     function setDirty(flag) {
       self.dirty = flag;
@@ -31,9 +32,49 @@ export const File = types
       self.content = content
     }
 
+    function setChildren(data) {
+      self.children = data;
+    }
+
+    function setExpanded(flag) {
+      self.expanded = flag;
+    }
+
+    function loadChildren() {
+      self.store.socket.emit('fs.readdir', {path: self.path}, data => {
+        console.log(data);
+        self.setChildren(data);
+        self.setExpanded(true);
+      })
+    }
+
+    function toggleDir() {
+      if (self.isDir) {
+        if (self.expanded) {
+          self.expanded = false;
+        } else {
+          loadChildren();
+          self.expanded = true;
+        }
+      }
+    }
+
+    // function open() {
+    //   self.store.socket.emit('fs.readfile', {path: self.path}, data => {
+    //     self.setContent(data);
+    //     self.store.openedFiles.push(self);
+    //     self.view.editorIndex = self.openedFiles.length -1;
+    //   })
+    // }
+
     return {
       setDirty,
-      setContent
+      setContent,
+      loadChildren,
+      setChildren,
+      setExpanded,
+      toggleDir,
+      // open
     }
   });
 
@@ -94,10 +135,11 @@ export const FileStore = types
       }
     }
 
-    function readfile(file) {
+    function readfile(file, fn) {
       if (!file.isDir) {
         self.store.socket.emit('fs.readfile', {path: file.path}, data => {
           self.store.fileStore.setContent(file, data);
+          fn.apply(self.store);
         })
       }
     }

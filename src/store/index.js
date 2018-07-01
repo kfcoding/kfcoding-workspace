@@ -131,9 +131,11 @@ export const Store = types
     }
 
     function openFile(file) {
+      self.fileStore.readfile(file, () => {
+      });
       self.openedFiles.push(file);
-      self.fileStore.readfile(file);
       self.view.editorIndex = self.openedFiles.length -1;
+      self.view.setCurrentFilePath(file.path);
     }
 
     function closeFile(file) {
