@@ -1,14 +1,15 @@
 import { types, getParent, flow } from 'mobx-state-tree';
 
-const File = types
+export const File = types
   .model('File', {
     name: types.string,
     isDir: types.boolean,
     type: types.string,
     size: types.number,
-    path: types.string,
+    path: types.identifier(),
     children: types.late(() => types.array(File)),
-    content: ''
+    content: '',
+    dirty: false
   }).views(self => ({
     get store() {
       return getParent(self, 2);
@@ -22,8 +23,17 @@ const File = types
       })
     }
 
+    function setDirty(flag) {
+      self.dirty = flag;
+    }
+
+    function setContent(content) {
+      self.content = content
+    }
+
     return {
-      loadWorkspace
+      setDirty,
+      setContent
     }
   });
 
@@ -49,9 +59,10 @@ export const FileStore = types
       file.content = content;
     }
 
-    function loadFiles() {
-      self.store.socket.emit('fs.readdir', {path: '/tmp'}, data => {
+    function loadFiles(path, fn) {
+      self.store.socket.emit('fs.readdir', {path: path || '/tmp'}, data => {
         self.store.fileStore.setFiles(data);
+        fn && fn();
       })
     }
 
