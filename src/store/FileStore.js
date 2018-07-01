@@ -8,7 +8,8 @@ export const File = types
     size: types.number,
     path: types.identifier(),
     children: types.late(() => types.array(File)),
-    content: '1233'
+    content: '',
+    dirty: false
   }).views(self => ({
     get store() {
       return getParent(self, 2);
@@ -22,8 +23,17 @@ export const File = types
       })
     }
 
+    function setDirty(flag) {
+      self.dirty = flag;
+    }
+
+    function setContent(content) {
+      self.content = content
+    }
+
     return {
-      loadWorkspace
+      setDirty,
+      setContent
     }
   });
 
@@ -49,9 +59,10 @@ export const FileStore = types
       file.content = content;
     }
 
-    function loadFiles() {
-      self.store.socket.emit('fs.readdir', {path: '/tmp'}, data => {
+    function loadFiles(path, fn) {
+      self.store.socket.emit('fs.readdir', {path: path || '/tmp'}, data => {
         self.store.fileStore.setFiles(data);
+        fn && fn();
       })
     }
 

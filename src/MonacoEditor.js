@@ -8,37 +8,21 @@ class MonacoEditor extends React.PureComponent {
   constructor(props) {
     super(props);
 
-    this.state = {
-      code: props.value || '// insert your code'
-    }
-
     this.dom = React.createRef();
     this.editor = null;
   }
 
-  editorDidMount = (editor, monaco) => {
-    console.log('editorDidMount', editor);
-    editor.focus();
-  }
-
-  onChange = (newValue, e) => {
-    console.log('onChange', newValue, e);
-    this.setState({code: newValue});
-  }
-
-  componentWillReceiveProps(next) {
-    if (next.value) {
-      this.setState({code: next.value});
-      this.editor.setValue(next.value);
-    }
-  }
-
   componentDidMount() {
     this.editor = monaco.editor.create(this.dom, {
-      value: this.state.code,
-      language: 'javascript',
+      value: this.props.file.content,
+      language: this.props.language || 'javascript',
       theme: 'vs-dark'
     });
+
+    this.editor.onDidChangeModelContent(e => {
+      this.props.file.setContent(this.editor.getValue());
+      this.props.file.setDirty(true);
+    })
   }
 
   handleResize = () => {
@@ -54,7 +38,7 @@ class MonacoEditor extends React.PureComponent {
         style={{width: '100%', height: '100%'}}
         onWidthChange={this.handleResize}
       >
-        <div ref={dom => this.dom = dom} style={{width: '100%', height: '100%'}}></div>
+        <div onChange={this.onChange} ref={dom => this.dom = dom} style={{width: '100%', height: '100%'}}></div>
       </Div>
     );
   }

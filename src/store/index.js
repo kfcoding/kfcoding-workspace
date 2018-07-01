@@ -7,6 +7,8 @@ import { File, FileStore } from "./FileStore";
 
 Xterm.applyAddon(fit);
 
+const WORKSPACE_DIR = '/tmp/workspace';
+
 export const Terminal = types
   .model('Terminal', {
     id: types.identifier(),
@@ -27,7 +29,7 @@ export const Terminal = types
       });
       self.terminal = terminal;
 
-      socket.emit('term.open', {id: self.id, cols: terminal.cols, rows: terminal.rows});
+      socket.emit('term.open', {id: self.id, cols: terminal.cols, rows: terminal.rows, cwd: WORKSPACE_DIR});
       terminal.on('key', (key, ev) => {
         socket.emit('term.input', {id: self.id, input: key});
       });
@@ -63,6 +65,7 @@ export const Store = types
   })).actions(self => {
     function afterCreate() {
 
+      self.view.setLoadingMsg('Connecting server...');
       /** connect socket **/
       let socket = io('http://localhost:16999');
       self.socket = socket;
@@ -73,11 +76,18 @@ export const Store = types
 
       /** fetch files **/
       socket.on('connect', () => {
-        self.fileStore.loadFiles()
-        // setTimeout(() => {
-        //   self.fileStore.readfile(self.files[12])
-        // }, 1000)
-      })
+
+        self.view.setLoadingMsg('Preparing workspace');
+
+        socket.emit('workspace.init', {
+          repo: 'https://github.com/kfcoding/shux',
+        }, () => {
+          self.fileStore.loadFiles('/tmp/workspace', () => {
+            self.view.setLoading(false);
+          })
+        })
+      });
+
     }
 
     function createTerminal() {
@@ -87,22 +97,22 @@ export const Store = types
       };
       self.terminals.push(term);
       self.view.terminalIndex = self.terminals.length - 1;
+      self.view.bottomHeight = 220;
     }
 
     function removeTerminal(term) {
       console.log(term, arguments);
       let idx = self.terminals.findIndex((item) => item === term);
-      console.log(idx)
       if (idx <= self.view.terminalIndex) {
         self.view.terminalIndex--;
       }
-      console.log(self.view.terminalIndex)
       self.terminals.remove(term);
     }
 
     function openFile(file) {
       self.openedFiles.push(file);
       self.fileStore.readfile(file);
+      self.view.editorIndex = self.openedFiles.length -1;
     }
 
     function closeFile(file) {
@@ -114,11 +124,25 @@ export const Store = types
       self.openedFiles.remove(file);
     }
 
+    function saveFiles(e) {
+      e.preventDefault();
+      self.openedFiles.map(f => {
+        self.socket.emit('fs.writefile', {path: f.path, content: f.content});
+        f.setDirty(false)
+      })
+    }
+
+    function hideBottom() {
+      self.view.setBottomHeight(30);
+    }
+
     return {
       afterCreate,
       createTerminal,
       removeTerminal,
       openFile,
-      closeFile
+      closeFile,
+      saveFiles,
+      hideBottom
     }
   });
