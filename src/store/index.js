@@ -5,6 +5,7 @@ import * as fit from "xterm/lib/addons/fit/fit";
 import { ViewStore } from "./ViewStore";
 import { File, FileStore } from "./FileStore";
 import { getQueryString } from '../utils/common'
+import { getWorkSpace } from "../services/workspace";
 
 Xterm.applyAddon(fit);
 
@@ -56,6 +57,7 @@ export const Store = types
     fileStore: types.optional(FileStore, {
       files: []
     }),
+    repo: '',
     openedFiles: types.array(types.reference(File))
   }).volatile(self => ({
     socket: null
@@ -64,30 +66,48 @@ export const Store = types
       return self.fileStore.files;
     }
   })).actions(self => {
-    function afterCreate() {
-      console.log(getQueryString('id'));
-      self.view.setLoadingMsg('Connecting server...');
-      /** connect socket **/
-      let socket = io('http://localhost:16999');
+    function setRepo(repo) {
+      self.repo = repo;
+    }
+
+    function setSocket(socket) {
       self.socket = socket;
+    }
 
-      socket.on('term.output', function(data) {
-        self.terminals.find(t => t.id === data.id).terminal.write(data.output)
-      });
+    function afterCreate() {
+      const id = getQueryString('id');
+      getWorkSpace(id).then(res => {
+        const gitUrl = res.data.result.workspace.gitUrl;
+        self.setRepo(gitUrl);
 
-      /** fetch files **/
-      socket.on('connect', () => {
 
-        self.view.setLoadingMsg('Preparing workspace');
+        self.view.setLoadingMsg('Connecting server...');
+        /** connect socket **/
+        let socket = io('http://vm:16999');
 
-        socket.emit('workspace.init', {
-          repo: 'https://github.com/kfcoding/shux',
-        }, () => {
-          self.fileStore.loadFiles('/tmp/workspace', () => {
-            self.view.setLoading(false);
-          })
-        })
-      });
+        self.setSocket(socket);
+        // self.socket = socket;
+
+        socket.on('term.output', function(data) {
+          self.terminals.find(t => t.id === data.id).terminal.write(data.output)
+        });
+        /** fetch files **/
+        socket.on('connect', () => {
+
+          self.view.setLoadingMsg('Preparing workspace');
+
+          console.log(self.repo);
+          if (self.repo != null && self.repo !== '') {
+            socket.emit('workspace.init', {
+              repo: self.repo,
+            }, () => {
+              self.fileStore.loadFiles('/tmp/workspace', () => {
+                self.view.setLoading(false);
+              })
+            })
+          }
+        });
+      })
 
     }
 
@@ -138,6 +158,8 @@ export const Store = types
     }
 
     return {
+      setSocket,
+      setRepo,
       afterCreate,
       createTerminal,
       removeTerminal,
