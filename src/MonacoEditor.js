@@ -1,6 +1,7 @@
 import React from 'react';
 import * as monaco from 'monaco-editor';
 import { measure } from '@pinyin/measure'
+import { when, autorun, reaction } from 'mobx'
 
 const Div = measure('div');
 
@@ -10,11 +11,17 @@ class MonacoEditor extends React.PureComponent {
 
     this.dom = React.createRef();
     this.editor = null;
+
+    autorun(() => {
+      if (this.editor)
+        this.editor.setValue(props.file.content)
+    })
   }
 
   componentWillReceiveProps(next) {
     if (next.file) {
-      this.editor.setValue(next.file.content)
+      if (!this.editor.getValue())
+        this.editor.setValue(next.file.content)
     }
   }
 

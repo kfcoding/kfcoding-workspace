@@ -12,6 +12,8 @@ import FileTree from './FileTree';
 import Bottom from './Bottom';
 import { inject, observer } from "mobx-react/index";
 import { mimeToType } from "./utils/language";
+import icons from "file-icons-js";
+import 'file-icons-js/css/style.css';
 
 const map = {
   saveFiles: ['command+s', 'ctrl+s']
@@ -38,7 +40,7 @@ const App = inject('store')(
       >
         <HotKeys keyMap={map} handlers={handlers} className="App">
           <Header/>
-          <div style={{height: 'calc(100% - 40px'}}>
+          <div style={{height: 'calc(100% - 48px'}}>
             <SplitPane
               split='horizontal'
               defaultSize={30}
@@ -59,7 +61,7 @@ const App = inject('store')(
                 {/*</div>*/}
                 <Tabs selectedIndex={store.view.editorIndex} onSelect={tabIndex => store.view.setEditorIndex(tabIndex)} style={{background: '#1c2022', color: '#e0e0e0', height: '100%'}}>
                   <TabList>
-                    {store.openedFiles.map(t => <Tab key={t}>{t.name} <IconClose style={{marginLeft: '10px'}} onClick={(e) => {store.closeFile(t);e.stopPropagation()}}/></Tab>)}
+                    {store.openedFiles.map(t => <Tab key={t}><i style={{fontStyle: 'normal'}} className={icons.getClassWithColor(t.name)}></i> {t.name} <IconClose style={{marginLeft: '10px'}} onClick={(e) => {store.closeFile(t);e.stopPropagation()}}/></Tab>)}
                   </TabList>
                   {store.openedFiles.map(t => <TabPanel key={t} style={{height: 'calc(100% - 25px)', background: '#000'}}><MonacoEditor language={mimeToType(t.type)} value={t.content} options={editorOptions} file={t}/></TabPanel>)}
                 </Tabs>

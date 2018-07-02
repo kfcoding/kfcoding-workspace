@@ -1,15 +1,14 @@
 import React from 'react';
 import styled from 'styled-components';
 import style from './FileItem.css'
-import FileIcon, {defaultStyles} from 'react-file-icon';
 import {inject, observer} from "mobx-react/index";
-// import Icon from 'react-native-vector-icons/dist/Feather';
 import {ContextMenu, MenuItem, ContextMenuTrigger} from "react-contextmenu";
 import IconFolder from 'react-icons/lib/fa/folder';
 import IconFolderOpen from 'react-icons/lib/fa/folder-open';
 import IconFile from 'react-icons/lib/fa/file';
 import IconBucket from 'react-icons/lib/fa/bitbucket';
 import AddItem from './AddItem';
+import icons from 'file-icons-js';
 
 const Container = styled.div`
   
@@ -91,7 +90,7 @@ const FileItem = inject('store')(
               :
               <FileContainer active={file.path === store.view.currentFilePath} depth={file.depth} onDoubleClick={() => {
                 store.openFile(file)
-              }}><IconFile/><span style={{paddingLeft: 5}}>{file.name}</span></FileContainer>
+              }}><i style={{fontStyle: 'normal'}} className={icons.getClassWithColor(file.name)}></i><span style={{paddingLeft: 5}}>{file.name}</span></FileContainer>
             }
             <div style={{display: file.expanded ? 'block' : 'none'}}>
               <AddItem file={file}/>

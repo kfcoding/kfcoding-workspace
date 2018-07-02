@@ -76,38 +76,49 @@ export const Store = types
 
     function afterCreate() {
       const id = getQueryString('id');
-      getWorkSpace(id).then(res => {
-        const gitUrl = res.data.result.workspace.gitUrl;
-        self.setRepo(gitUrl);
+      //getWorkSpace(id).then(res => {
+      fetch('http://localhost:3000/workspace', {
+        method: 'POST',
+        mode: 'cors',
+        headers: {
+          'content-type': 'application/json'
+        }
+      }).then(res => res.json())
+        .then(res => {
+          console.log(res);
+          const gitUrl = 'https://gitee.com/gdtongji/mobx-state-tree.git';//res.data.result.workspace.gitUrl;
+          self.setRepo(gitUrl);
 
 
-        self.view.setLoadingMsg('Connecting server...');
-        /** connect socket **/
-        let socket = io('http://vm:16999');
+          self.view.setLoadingMsg('Connecting server...');
+          /** connect socket **/
+          let socket = io('http://' + res.name + '.workspace.cloudwarehub.com');
 
-        self.setSocket(socket);
-        // self.socket = socket;
+          self.setSocket(socket);
+          // self.socket = socket;
 
-        socket.on('term.output', function(data) {
-          self.terminals.find(t => t.id === data.id).terminal.write(data.output)
-        });
-        /** fetch files **/
-        socket.on('connect', () => {
+          socket.on('term.output', function(data) {
+            self.terminals.find(t => t.id === data.id).terminal.write(data.output)
+          });
+          /** fetch files **/
+          socket.on('connect', () => {
 
-          self.view.setLoadingMsg('Preparing workspace');
+            self.view.setLoadingMsg('Preparing workspace...');
 
-          console.log(self.repo);
-          if (self.repo != null && self.repo !== '') {
             socket.emit('workspace.init', {
               repo: self.repo,
             }, () => {
               self.fileStore.loadFiles('/tmp/workspace', () => {
-                self.view.setLoading(false);
+                self.view.setLoadingMsg('Completed! Happy coding~');
+                setTimeout(() => {
+                  self.view.setLoading(false);
+                }, 2500)
               })
             })
-          }
-        });
-      })
+          });
+        })
+
+      //})
 
     }
 
