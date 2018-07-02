@@ -82,7 +82,7 @@ const FileItem = inject('store')(
               }}><IconFile/><span style={{paddingLeft: 5}}>{file.name}</span></FileContainer>
             }
             <div style={{display: file.expanded ? 'block' : 'none'}}>
-              {file.children.map(f => <FileItem key={f} file={f}/>)}
+              {file.children.sort((a, b) => {return b.isDir - a.isDir}).map(f => <FileItem key={f} file={f}/>)}
             </div>
           </Container>
         </ContextMenuTrigger>
