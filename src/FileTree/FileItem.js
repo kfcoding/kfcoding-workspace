@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import style from './FileIntem.css'
+import style from './FileItem.css'
 import FileIcon, {defaultStyles} from 'react-file-icon';
 import {inject, observer} from "mobx-react/index";
 // import Icon from 'react-native-vector-icons/dist/Feather';
@@ -9,6 +9,7 @@ import IconFolder from 'react-icons/lib/fa/folder';
 import IconFolderOpen from 'react-icons/lib/fa/folder-open';
 import IconFile from 'react-icons/lib/fa/file';
 import IconBucket from 'react-icons/lib/fa/bitbucket';
+import AddItem from './AddItem';
 
 const Container = styled.div`
   
@@ -56,8 +57,19 @@ const FileContainer = styled.div`
 const FileItem = inject('store')(
   observer(({file, store}) => {
 
-    const handleClick = (e, data) => {
-      console.log(data.item);
+    const handleAddFileClick = (e, data) => {
+      file.setAdd('file');
+      // console.log(data.item);
+
+    }
+
+    const handleAddFoldClick = (e, data) => {
+      file.setAdd('fold');
+      // console.log(data.item);
+    }
+
+    const handleDeleteClick = (e, data) => {
+      // console.log(data.item);
     }
 
     return (
@@ -82,16 +94,18 @@ const FileItem = inject('store')(
               }}><IconFile/><span style={{paddingLeft: 5}}>{file.name}</span></FileContainer>
             }
             <div style={{display: file.expanded ? 'block' : 'none'}}>
+              <AddItem file={file}/>
               {file.children.sort((a, b) => {return b.isDir - a.isDir}).map(f => <FileItem key={f} file={f}/>)}
             </div>
           </Container>
         </ContextMenuTrigger>
         <ContextMenu id={file.path} className='menu'>
-          <MenuItem onClick={handleClick} data={{ item: 'item 1' }} attributes={{className :'menu-item-container'}}><IconFile style={{marginRight: '5px'}}/>添加文件</MenuItem>
-          <MenuItem onClick={this.handleClick} data={{ item: 'item 2' }} attributes={{className :'menu-item-container'}}><IconFolder style={{marginRight: '5px'}}/>添加文件夹</MenuItem>
+          <MenuItem onClick={handleAddFileClick} data={{ item: 'item 1' }} attributes={{className :'menu-item-container'}}><IconFile style={{marginRight: '5px'}}/>添加文件</MenuItem>
+          <MenuItem onClick={handleAddFoldClick} data={{ item: 'item 2' }} attributes={{className :'menu-item-container'}}><IconFolder style={{marginRight: '5px'}}/>添加文件夹</MenuItem>
           <MenuItem divider />
-          <MenuItem onClick={this.handleClick} data={{ item: 'item 3' }} attributes={{className :'menu-item-container'}}><IconBucket style={{marginRight: '5px'}}/>删除文件</MenuItem>
+          <MenuItem onClick={handleDeleteClick} data={{ item: 'item 3' }} attributes={{className :'menu-item-container'}}><IconBucket style={{marginRight: '5px'}}/>删除文件</MenuItem>
         </ContextMenu>
+
       </div>
     )
   })

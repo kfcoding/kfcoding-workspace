@@ -10,7 +10,9 @@ export const File = types
     children: types.late(() => types.array(File)),
     content: '',
     dirty: false,
-    expanded: false
+    expanded: false,
+    add: '',
+    addName: '',
   }).views(self => ({
     get store() {
       return getRoot(self);
@@ -23,6 +25,14 @@ export const File = types
       }
     }
   })).actions(self => {
+
+    function setAddName(name) {
+      self.addName = name;
+    }
+
+    function setAdd(flag) {
+      self.add = flag;
+    }
 
     function setDirty(flag) {
       self.dirty = flag;
@@ -68,6 +78,8 @@ export const File = types
     // }
 
     return {
+      setAddName,
+      setAdd,
       setDirty,
       setContent,
       loadChildren,

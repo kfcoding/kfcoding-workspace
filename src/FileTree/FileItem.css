@@ -45,3 +45,18 @@
     line-height: 1;
     -webkit-tap-highlight-color: rgba(0,0,0,0);
 }
+
+.add-item-input {
+    position: relative;
+    /*display: flex;*/
+    font-size: 14px;
+    font-weight: 400;
+    min-width: 100px;
+    cursor: pointer;
+    user-select: none;
+    color: rgb(224, 224, 224);
+    background-color: rgba(108, 174, 221, 0.1);
+    /*padding: 0.4rem 3rem 0.4rem calc(2rem - 2px);*/
+    text-decoration: none;
+    border-left: 2px solid transparent;
+}
