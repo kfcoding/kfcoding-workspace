@@ -121,7 +121,7 @@ const FileItem = inject('store')(
                 </span></FileContainer>
               :
               <FileContainer active={file.path === store.view.currentFilePath} depth={file.depth} onDoubleClick={() => {
-                store.openFile(file)
+                file.open()
               }}><i style={{fontStyle: 'normal'}} className={icons.getClassWithColor(file.name)}></i><span style={{paddingLeft: 5}}>{file.name}</span></FileContainer>
             }
             <div style={{display: file.expanded ? 'block' : 'none'}}>

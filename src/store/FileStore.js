@@ -73,13 +73,13 @@ export const File = types
       }
     }
 
-    // function open() {
-    //   self.store.socket.emit('fs.readfile', {path: self.path}, data => {
-    //     self.setContent(data);
-    //     self.store.openedFiles.push(self);
-    //     self.view.editorIndex = self.openedFiles.length -1;
-    //   })
-    // }
+    function open() {
+      self.store.socket.emit('fs.readfile', {path: self.path}, data => {
+        self.setContent(data);
+        self.store.pushOpenedFile(self);
+        self.store.view.setEditorIndex(self.store.openedFiles.length - 1);
+      })
+    }
 
     return {
       setReName,
@@ -91,7 +91,7 @@ export const File = types
       setChildren,
       setExpanded,
       toggleDir,
-      // open
+      open
     }
   });
 
@@ -148,6 +148,6 @@ export const FileStore = types
       unlink,
       rename,
       rmdir,
-      readfile
+      // readfile
     }
   });

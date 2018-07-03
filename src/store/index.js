@@ -167,6 +167,10 @@ export const Store = types
       self.view.setBottomHeight(30);
     }
 
+    function pushOpenedFile(file) {
+      self.openedFiles.push(file)
+    }
+
     return {
       setSocket,
       setRepo,
@@ -176,6 +180,7 @@ export const Store = types
       openFile,
       closeFile,
       saveFiles,
-      hideBottom
+      hideBottom,
+      pushOpenedFile
     }
   });
