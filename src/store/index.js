@@ -105,11 +105,11 @@ export const Store = types
             socket.emit('workspace.init', {
               repo: repo,
             }, () => {
-              self.fileStore.loadFiles('/tmp/workspace', () => {
+              self.fileStore.root.loadChildren(() => {
                 self.view.setLoadingMsg('Completed! Happy coding~');
                 setTimeout(() => {
                   self.view.setLoading(false);
-                }, 2500)
+                }, 1500)
               })
             })
           });

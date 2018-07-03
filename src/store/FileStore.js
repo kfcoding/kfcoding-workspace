@@ -54,11 +54,11 @@ export const File = types
       self.expanded = flag;
     }
 
-    function loadChildren() {
+    function loadChildren(fn) {
       self.store.socket.emit('fs.readdir', {path: self.path}, data => {
-        console.log(data);
         self.setChildren(data);
         self.setExpanded(true);
+        fn && fn(data)
       })
     }
 
@@ -97,38 +97,19 @@ export const File = types
 
 export const FileStore = types
   .model("FileStore", {
-    files: types.array(File)
+    root: types.optional(File, {
+      name: 'workspace',
+      path: '/tmp/workspace',
+      isDir: true,
+      size: 0,
+      type: 'file',
+      children: []
+    })
   }).views(self => ({
     get store() {
       return getParent(self)
     }
   })).actions(self => {
-    let socket = self.store.socket;
-
-    function setFiles(files) {
-      self.files = files;
-    }
-
-    function setChildren(file, files) {
-      file.children = files;
-    }
-
-    function setContent(file, content) {
-      file.content = content;
-    }
-
-    function loadFiles(path, fn) {
-      self.store.socket.emit('fs.readdir', {path: path || '/tmp'}, data => {
-        self.store.fileStore.setFiles(data);
-        fn && fn();
-      })
-    }
-
-    function readdir(file) {
-      self.store.socket.emit('fs.readdir', {path: file.path}, data => {
-        self.store.fileStore.setChildren(file, data);
-      })
-    }
 
     function mkdir(path) {
       self.store.socket.emit('fs.mkdir', {path: path});
@@ -162,11 +143,6 @@ export const FileStore = types
     }
 
     return {
-      loadFiles,
-      setFiles,
-      setChildren,
-      setContent,
-      readdir,
       mkdir,
       writefile,
       unlink,
