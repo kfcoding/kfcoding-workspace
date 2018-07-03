@@ -7,6 +7,7 @@ import IconFolder from 'react-icons/lib/fa/folder';
 import IconFolderOpen from 'react-icons/lib/fa/folder-open';
 import IconFile from 'react-icons/lib/fa/file';
 import IconBucket from 'react-icons/lib/fa/bitbucket';
+import IconFaCircleONotch from 'react-icons/lib/fa/circle-o-notch';
 import AddItem from './AddItem';
 import icons from 'file-icons-js';
 
@@ -59,18 +60,46 @@ const FileItem = inject('store')(
 
     const handleAddFileClick = (e, data) => {
       file.setAdd('file');
+      if (!file.expanded) {
+        file.toggleDir()
+      }
+      const input = this.refs.addItem.refs.fileInput;
+      input.focus();
+      input.setSelectionRange(0, input.value.length);
       // console.log(data.item);
 
     }
 
     const handleAddFoldClick = (e, data) => {
       file.setAdd('fold');
+      if (!file.expanded) {
+        file.toggleDir()
+      }
+      console.log("refs")
+      console.log(this.refs)
+      // const input = this.refs.addItem.refs.foldInput;
+      // input.focus();
+      // input.setSelectionRange(0, input.value.length);
       // console.log(data.item);
     }
 
+    const handleRenameClick = (e, data) => {
+
+    }
+
+    const handleChange = (event) => {
+      file.setRename(event.target.value);
+    }
+
+    const handleOnBlue = (event) => {
+    }
+
     const handleDeleteClick = (e, data) => {
+      store.fileStore.rmdir(file)
       // console.log(data.item);
     }
+
+
 
     return (
       <div>
@@ -86,7 +115,9 @@ const FileItem = inject('store')(
                   <IconFolder/>
                 }
                 <span style={{paddingLeft: 5}}>
-                {file.name}
+                  {file.name}
+                  {/*{file.reName? <div>file.name</div> : <input onblur={handleOnBlue} ref='foldInput' className='add-item-input' type='text' value={file.name} onChange={handleChange}> }*/}
+
                 </span></FileContainer>
               :
               <FileContainer active={file.path === store.view.currentFilePath} depth={file.depth} onDoubleClick={() => {
@@ -94,15 +125,16 @@ const FileItem = inject('store')(
               }}><i style={{fontStyle: 'normal'}} className={icons.getClassWithColor(file.name)}></i><span style={{paddingLeft: 5}}>{file.name}</span></FileContainer>
             }
             <div style={{display: file.expanded ? 'block' : 'none'}}>
-              <AddItem file={file}/>
+              <AddItem file={file} ref='addItem'/>
               {file.children.sort((a, b) => {return b.isDir - a.isDir}).map(f => <FileItem key={f} file={f}/>)}
             </div>
           </Container>
         </ContextMenuTrigger>
         <ContextMenu id={file.path} className='menu'>
-          <MenuItem onClick={handleAddFileClick} data={{ item: 'item 1' }} attributes={{className :'menu-item-container'}}><IconFile style={{marginRight: '5px'}}/>添加文件</MenuItem>
+          <MenuItem onClick={handleAddFileClick.bind(this)} data={{ item: 'item 1' }} attributes={{className :'menu-item-container'}}><IconFile style={{marginRight: '5px'}}/>添加文件</MenuItem>
           <MenuItem onClick={handleAddFoldClick} data={{ item: 'item 2' }} attributes={{className :'menu-item-container'}}><IconFolder style={{marginRight: '5px'}}/>添加文件夹</MenuItem>
           <MenuItem divider />
+          <MenuItem onClick={handleRenameClick} data={{ item: 'item 3' }} attributes={{className :'menu-item-container'}}><IconFaCircleONotch style={{marginRight: '5px'}}/>重命名</MenuItem>
           <MenuItem onClick={handleDeleteClick} data={{ item: 'item 3' }} attributes={{className :'menu-item-container'}}><IconBucket style={{marginRight: '5px'}}/>删除文件</MenuItem>
         </ContextMenu>
 

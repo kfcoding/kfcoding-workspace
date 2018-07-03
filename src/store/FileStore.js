@@ -13,6 +13,7 @@ export const File = types
     expanded: false,
     add: '',
     addName: '',
+    reName: '',
   }).views(self => ({
     get store() {
       return getRoot(self);
@@ -25,6 +26,9 @@ export const File = types
       }
     }
   })).actions(self => {
+    function setReName(name) {
+      self.reName = name;
+    }
 
     function setAddName(name) {
       self.addName = name;
@@ -78,6 +82,7 @@ export const File = types
     // }
 
     return {
+      setReName,
       setAddName,
       setAdd,
       setDirty,
