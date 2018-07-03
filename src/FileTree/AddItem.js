@@ -60,18 +60,25 @@ const AddItem = inject('store')(
       file.setAddName(event.target.value)
     }
 
+    const handleOnBlue = (event) => {
+      if (event.target.value !== '') {
+        file.mkdir(file.path+event.target.value);
+      }
+      file.setAdd('');
+    }
+
     const show = () => {
       if (file.add === 'fold'){
         // ReactDOM.findDOMNode(this.refs.input).focus();
         return (
-          <FileContainer style={{marginLeft: '26px'}}>
-            <IconFolder style={{marginRight : '5px'}} /><input className='add-item-input' type='text' value={file.addName} onChange={handleChange}/>
+          <FileContainer depth={file.depth+1} >
+            <IconFolder style={{marginRight : '5px'}} /><input onblur={handleOnBlue} ref='foldInput' className='add-item-input' type='text' value={file.addName} onChange={handleChange}/>
           </FileContainer>
         )
       } else if (file.add === 'file'){
         return (
           <FileContainer style={{marginLeft: '26px'}}>
-            <IconFile style={{marginRight : '5px'}} /><input className='add-item-input' type='text' value={file.addName} onChange={handleChange}/>
+            <IconFile style={{marginRight : '5px'}} /><input ref='fileInput' className='add-item-input' type='text' value={file.addName} onChange={handleChange}/>
           </FileContainer>)
       }
     }

@@ -58,5 +58,6 @@
     background-color: rgba(108, 174, 221, 0.1);
     /*padding: 0.4rem 3rem 0.4rem calc(2rem - 2px);*/
     text-decoration: none;
-    border-left: 2px solid transparent;
+    border: 2px solid transparent;
+    /*border-color: #3a3a3a;*/
 }
