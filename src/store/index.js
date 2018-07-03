@@ -75,8 +75,13 @@ export const Store = types
     }
 
     function afterCreate() {
-      const id = getQueryString('id');
+      const id = window.location.split('/').pop();
+
       getWorkSpace(id).then(r => {
+        if (r.err) {
+          alert('no workspace id specified.');
+          return;
+        }
         fetch('http://aliapi.workspace.cloudwarehub.com/workspace', {
           method: 'POST',
           mode: 'cors',
