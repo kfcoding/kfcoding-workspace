@@ -75,7 +75,7 @@ export const Store = types
     }
 
     function afterCreate() {
-      const id = window.location.split('/').pop();
+      const id = window.location.href.split('/').pop();
 
       getWorkSpace(id).then(r => {
         if (r.err) {
