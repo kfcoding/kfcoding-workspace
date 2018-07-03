@@ -76,19 +76,16 @@ export const Store = types
 
     function afterCreate() {
       const id = getQueryString('id');
-      //getWorkSpace(id).then(res => {
-      fetch('http://localhost:3000/workspace', {
-        method: 'POST',
-        mode: 'cors',
-        headers: {
-          'content-type': 'application/json'
-        }
-      }).then(res => res.json())
-        .then(res => {
+      getWorkSpace(id).then(r => {
+        fetch('http://aliapi.workspace.cloudwarehub.com/workspace', {
+          method: 'POST',
+          mode: 'cors',
+          headers: {
+            'content-type': 'application/json'
+          }
+        }).then(res => res.json()).then(res => {
           console.log(res);
-          const gitUrl = 'https://gitee.com/gdtongji/mobx-state-tree.git';//res.data.result.workspace.gitUrl;
-          self.setRepo(gitUrl);
-
+          const repo = r.data.result.workspace.gitUrl;
 
           self.view.setLoadingMsg('Connecting server...');
           /** connect socket **/
@@ -106,7 +103,7 @@ export const Store = types
             self.view.setLoadingMsg('Preparing workspace...');
 
             socket.emit('workspace.init', {
-              repo: self.repo,
+              repo: repo,
             }, () => {
               self.fileStore.loadFiles('/tmp/workspace', () => {
                 self.view.setLoadingMsg('Completed! Happy coding~');
@@ -118,7 +115,7 @@ export const Store = types
           });
         })
 
-      //})
+      })
 
     }
 

@@ -23,6 +23,7 @@ const FileContainer = styled.div`
   background: ${props => props.active ? 'rgba(139,191,228,0.2)' : 'inherit'};
   padding-left: ${props => 20 + props.depth * 20 + 'px'};
   border-left: 2px solid ${props => props.active ? '#fff' : 'inherit'};
+  white-space: nowrap;
   &:hover {
     background: rgba(108,174,221,0.1);
   }
