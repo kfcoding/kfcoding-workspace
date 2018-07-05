@@ -77,14 +77,17 @@ export const Store = types
     function afterCreate() {
       const id = getQueryString('id');
       getWorkSpace(id).then(r => {
-        fetch('http://aliapi.workspace.cloudwarehub.com/workspace', {
+        const name = r.data.containerName;
+        // 启动容器
+
+        fetch('http://aliapi.workspace.cloudwarehub.com/workspace/start', {
           method: 'POST',
           mode: 'cors',
           headers: {
             'content-type': 'application/json'
-          }
+          },
+          data: JSON.stringify(name)
         }).then(res => res.json()).then(res => {
-          console.log(res);
           const repo = r.data.result.workspace.gitUrl;
 
           self.view.setLoadingMsg('Connecting server...');

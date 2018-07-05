@@ -50,6 +50,13 @@ export const File = types
       self.children = data;
     }
 
+    function pushChildren(child) {
+      const array = self.children.slice();
+      array.push(child);
+      self.children = array
+      console.log(self.children.slice())
+    }
+
     function setExpanded(flag) {
       self.expanded = flag;
     }
@@ -89,6 +96,7 @@ export const File = types
       setContent,
       loadChildren,
       setChildren,
+      pushChildren,
       setExpanded,
       toggleDir,
       open

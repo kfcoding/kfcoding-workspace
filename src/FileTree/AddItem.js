@@ -1,13 +1,7 @@
 import React from 'react';
-import ReactDOM from 'react-dom'
 import styled from 'styled-components';
-import style from './FileItem.css'
-import FileIcon, {defaultStyles} from 'react-file-icon';
 import {inject, observer} from "mobx-react/index";
-// import Icon from 'react-native-vector-icons/dist/Feather';
-import {ContextMenu, MenuItem, ContextMenuTrigger} from "react-contextmenu";
 import IconFolder from 'react-icons/lib/fa/folder';
-import IconFolderOpen from 'react-icons/lib/fa/folder-open';
 import IconFile from 'react-icons/lib/fa/file';
 
 const Container = styled.div`
@@ -71,13 +65,13 @@ const AddItem = inject('store')(
       if (file.add === 'fold'){
         // ReactDOM.findDOMNode(this.refs.input).focus();
         return (
-          <FileContainer depth={file.depth+1} >
+          <FileContainer depth={file.depth} >
             <IconFolder style={{marginRight : '5px'}} /><input onblur={handleOnBlue} ref='foldInput' className='add-item-input' type='text' value={file.addName} onChange={handleChange}/>
           </FileContainer>
         )
       } else if (file.add === 'file'){
         return (
-          <FileContainer style={{marginLeft: '26px'}}>
+          <FileContainer depth={file.depth}>
             <IconFile style={{marginRight : '5px'}} /><input ref='fileInput' className='add-item-input' type='text' value={file.addName} onChange={handleChange}/>
           </FileContainer>)
       }

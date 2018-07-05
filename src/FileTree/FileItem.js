@@ -59,13 +59,25 @@ const FileItem = inject('store')(
   observer(({file, store}) => {
 
     const handleAddFileClick = (e, data) => {
-      file.setAdd('file');
       if (!file.expanded) {
         file.toggleDir()
       }
-      const input = this.refs.addItem.refs.fileInput;
-      input.focus();
-      input.setSelectionRange(0, input.value.length);
+      const newFile = {
+        name: '',
+        isDir: false,
+        type: 'file',
+        size: 0,
+        path: file.path,
+        children: [],
+        content: '',
+        dirty: false,
+        expanded: false,
+        add: 'file',
+      }
+      file.pushChildren(newFile);
+      // const input = this.refs.addItem.refs.fileInput;
+      // input.focus();
+      // input.setSelectionRange(0, input.value.length);
       // console.log(data.item);
 
     }
@@ -99,6 +111,9 @@ const FileItem = inject('store')(
       // console.log(data.item);
     }
 
+    const handleInputChange = (event) => {
+      file.setAddName(event.target.value)
+    }
 
 
     return (
@@ -115,7 +130,9 @@ const FileItem = inject('store')(
                   <IconFolder/>
                 }
                 <span style={{paddingLeft: 5}}>
-                  {file.name}
+                  {file.add === '' ? file.name :
+                    <input onBlur={handleOnBlue} className='add-item-input' type='text'
+                           value={file.name} onChange={handleInputChange}/> }
                   {/*{file.reName? <div>file.name</div> : <input onblur={handleOnBlue} ref='foldInput' className='add-item-input' type='text' value={file.name} onChange={handleChange}> }*/}
 
                 </span></FileContainer>
@@ -125,13 +142,12 @@ const FileItem = inject('store')(
               }}><i style={{fontStyle: 'normal'}} className={icons.getClassWithColor(file.name)}></i><span style={{paddingLeft: 5}}>{file.name}</span></FileContainer>
             }
             <div style={{display: file.expanded ? 'block' : 'none'}}>
-              <AddItem file={file} ref='addItem'/>
               {file.children.sort((a, b) => {return b.isDir - a.isDir}).map(f => <FileItem key={f} file={f}/>)}
             </div>
           </Container>
         </ContextMenuTrigger>
         <ContextMenu id={file.path} className='menu'>
-          <MenuItem onClick={handleAddFileClick.bind(this)} data={{ item: 'item 1' }} attributes={{className :'menu-item-container'}}><IconFile style={{marginRight: '5px'}}/>添加文件</MenuItem>
+          <MenuItem onClick={handleAddFileClick} data={{ item: 'item 1' }} attributes={{className :'menu-item-container'}}><IconFile style={{marginRight: '5px'}}/>添加文件</MenuItem>
           <MenuItem onClick={handleAddFoldClick} data={{ item: 'item 2' }} attributes={{className :'menu-item-container'}}><IconFolder style={{marginRight: '5px'}}/>添加文件夹</MenuItem>
           <MenuItem divider />
           <MenuItem onClick={handleRenameClick} data={{ item: 'item 3' }} attributes={{className :'menu-item-container'}}><IconFaCircleONotch style={{marginRight: '5px'}}/>重命名</MenuItem>
