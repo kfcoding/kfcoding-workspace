@@ -75,9 +75,12 @@ export const Store = types
     }
 
     function afterCreate() {
-      const id = getQueryString('id');
+      const url = document.location.toString().split("//")[1];
+      const id = url.split("/")[1]
       getWorkSpace(id).then(r => {
-        const name = r.data.containerName;
+        console.log(r)
+        const containerName = r.data.result.workspace.containerName;
+        const postData = {name : containerName};
         // 启动容器
 
         fetch('http://aliapi.workspace.cloudwarehub.com/workspace/start', {
@@ -86,13 +89,13 @@ export const Store = types
           headers: {
             'content-type': 'application/json'
           },
-          data: JSON.stringify(name)
-        }).then(res => res.json()).then(res => {
+          body: JSON.stringify(postData)
+        }).then(() => {
           const repo = r.data.result.workspace.gitUrl;
 
           self.view.setLoadingMsg('Connecting server...');
           /** connect socket **/
-          let socket = io('http://' + res.name + '.workspace.cloudwarehub.com');
+          let socket = io('http://' + containerName + '.workspace.cloudwarehub.com');
 
           self.setSocket(socket);
           // self.socket = socket;
