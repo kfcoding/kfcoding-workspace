@@ -9,7 +9,7 @@ import { getWorkSpace } from "../services/workspace";
 
 Xterm.applyAddon(fit);
 
-const WORKSPACE_DIR = '/tmp/workspace';
+const WORKSPACE_DIR = '/workspace';
 
 export const Terminal = types
   .model('Terminal', {
@@ -78,7 +78,6 @@ export const Store = types
       const url = document.location.toString().split("//")[1];
       const id = url.split("/")[1]
       getWorkSpace(id).then(r => {
-        console.log(r)
         const containerName = r.data.result.workspace.containerName;
         const postData = {name : containerName};
         // 启动容器
@@ -96,6 +95,7 @@ export const Store = types
           self.view.setLoadingMsg('Connecting server...');
           /** connect socket **/
           let socket = io('http://' + containerName + '.workspace.cloudwarehub.com');
+          // let socket = io('http://192.168.1.119:16999');
 
           self.setSocket(socket);
           // self.socket = socket;

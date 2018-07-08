@@ -1,4 +1,4 @@
-import { types, getParent, getRoot, hasParentOfType } from 'mobx-state-tree';
+import {types, getParent, getRoot, hasParentOfType} from 'mobx-state-tree';
 
 export const File = types
   .model('File', {
@@ -12,8 +12,7 @@ export const File = types
     dirty: false,
     expanded: false,
     add: '',
-    addName: '',
-    reName: '',
+    reName: false,
   }).views(self => ({
     get store() {
       return getRoot(self);
@@ -26,12 +25,12 @@ export const File = types
       }
     }
   })).actions(self => {
-    function setReName(name) {
-      self.reName = name;
+    function setReName(flag) {
+      self.reName = flag;
     }
 
-    function setAddName(name) {
-      self.addName = name;
+    function setName(name) {
+      self.name = name;
     }
 
     function setAdd(flag) {
@@ -50,15 +49,20 @@ export const File = types
       self.children = data;
     }
 
-    function pushChildren(child) {
-      const array = self.children.slice();
-      array.push(child);
-      self.children = array
-      console.log(self.children.slice())
+    function pushChildren(file) {
+      self.children.push(file)
+    }
+
+    function popChildren() {
+      self.children.pop()
     }
 
     function setExpanded(flag) {
       self.expanded = flag;
+    }
+
+    function setPath(path) {
+      self.path = path;
     }
 
     function loadChildren(fn) {
@@ -69,12 +73,12 @@ export const File = types
       })
     }
 
-    function toggleDir() {
+    function toggleDir(fn) {
       if (self.isDir) {
         if (self.expanded) {
           self.expanded = false;
         } else {
-          loadChildren();
+          loadChildren(fn);
           self.expanded = true;
         }
       }
@@ -90,13 +94,15 @@ export const File = types
 
     return {
       setReName,
-      setAddName,
+      setPath,
+      setName,
       setAdd,
       setDirty,
       setContent,
       loadChildren,
       setChildren,
       pushChildren,
+      popChildren,
       setExpanded,
       toggleDir,
       open
@@ -107,7 +113,7 @@ export const FileStore = types
   .model("FileStore", {
     root: types.optional(File, {
       name: 'workspace',
-      path: '/tmp/workspace',
+      path: '/workspace',
       isDir: true,
       size: 0,
       type: 'file',
@@ -120,7 +126,9 @@ export const FileStore = types
   })).actions(self => {
 
     function mkdir(path) {
-      self.store.socket.emit('fs.mkdir', {path: path});
+      self.store.socket.emit('fs.mkdir', {path: path}, (data) => {
+        if (data) alert(data)
+      });
     }
 
     function writefile(path, content) {
@@ -137,7 +145,9 @@ export const FileStore = types
 
     function rmdir(file) {
       if (file.isDir) {
-        self.store.socket.emit('fs.rmdir', {path: file.path});
+        self.store.socket.emit('fs.rmdir', {path: file.path}, (data) => {
+          if (data) alert(data)
+        });
       }
     }
 

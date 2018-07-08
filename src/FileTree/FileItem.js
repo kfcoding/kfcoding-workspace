@@ -56,63 +56,113 @@ const FileContainer = styled.div`
 
 
 const FileItem = inject('store')(
-  observer(({file, store}) => {
-
+  observer(({parentFile, file, store}) => {
     const handleAddFileClick = (e, data) => {
-      if (!file.expanded) {
-        file.toggleDir()
-      }
       const newFile = {
         name: '',
         isDir: false,
         type: 'file',
         size: 0,
-        path: file.path,
+        path: file.path + "/",
         children: [],
         content: '',
         dirty: false,
         expanded: false,
         add: 'file',
+        reName: false,
       }
-      file.pushChildren(newFile);
-      // const input = this.refs.addItem.refs.fileInput;
-      // input.focus();
-      // input.setSelectionRange(0, input.value.length);
-      // console.log(data.item);
+      if (!file.expanded) {
+        const fn = () => {
+          file.pushChildren(newFile)
+        }
+        file.toggleDir(fn)
+      } else {
+        file.pushChildren(newFile)
+      }
 
     }
 
     const handleAddFoldClick = (e, data) => {
-      file.setAdd('fold');
-      if (!file.expanded) {
-        file.toggleDir()
+      const newFold = {
+        name: '',
+        isDir: true,
+        type: 'file',
+        size: 0,
+        path: file.path + "/",
+        children: [],
+        content: '',
+        dirty: false,
+        expanded: false,
+        add: 'file',
+        reName: false,
       }
-      console.log("refs")
-      console.log(this.refs)
-      // const input = this.refs.addItem.refs.foldInput;
-      // input.focus();
-      // input.setSelectionRange(0, input.value.length);
-      // console.log(data.item);
+      if (!file.expanded) {
+        const fn = () => {
+          file.pushChildren(newFold)
+        }
+        file.toggleDir(fn)
+      } else {
+        file.pushChildren(newFold)
+      }
     }
 
     const handleRenameClick = (e, data) => {
-
+      file.setReName(true);
     }
 
-    const handleChange = (event) => {
-      file.setRename(event.target.value);
+    const handleFileOnBlue = (event) => {
+      if (event.target.value !== '') {
+        const path = file.path + event.target.value;
+        store.fileStore.writefile(path, '');
+        parentFile.loadChildren();
+      } else {
+        parentFile.popChildren()
+      }
     }
 
-    const handleOnBlue = (event) => {
+    const handleDirOnBlue = (event) => {
+      if (event.target.value !== '') {
+        const path = file.path + event.target.value;
+        store.fileStore.mkdir(path);
+        // file.setPath(path);
+        file.setAdd('');
+      } else {
+        parentFile.popChildren()
+      }
+      parentFile.loadChildren();
+    }
+
+    const handleReNameOnBlue = (event) => {
+      if (!file.reName) {
+        return;
+      }
+      if (event.target.value !== '') {
+        const pathArray = file.path.split('/');
+        var path = '';
+        if (file.isDir) {
+          pathArray[pathArray.length] = event.target.value;
+        } else {
+          pathArray[pathArray.length - 1] = event.target.value;
+        }
+        path = pathArray.toString();
+        path = path.replace(/,/g, "/")
+        store.fileStore.rename(file, path);
+      }
+      parentFile.loadChildren();
     }
 
     const handleDeleteClick = (e, data) => {
-      store.fileStore.rmdir(file)
-      // console.log(data.item);
+      debugger
+      if (file.isDir) {
+        store.fileStore.rmdir(file)
+      } else {
+        store.fileStore.unlink(file)
+      }
+      parentFile.loadChildren();
     }
 
     const handleInputChange = (event) => {
-      file.setAddName(event.target.value)
+      file.setName(event.target.value)
     }
 
 
@@ -131,27 +181,40 @@ const FileItem = inject('store')(
                 }
                 <span style={{paddingLeft: 5}}>
                   {file.add === '' ? file.name :
-                    <input onBlur={handleOnBlue} className='add-item-input' type='text'
-                           value={file.name} onChange={handleInputChange}/> }
-                  {/*{file.reName? <div>file.name</div> : <input onblur={handleOnBlue} ref='foldInput' className='add-item-input' type='text' value={file.name} onChange={handleChange}> }*/}
-
+                    <input autoFocus={true} onBlur={handleDirOnBlue} className='add-item-input' type='text'
+                           value={file.name} onChange={handleInputChange}/>}
                 </span></FileContainer>
               :
               <FileContainer active={file.path === store.view.currentFilePath} depth={file.depth} onDoubleClick={() => {
                 file.open()
-              }}><i style={{fontStyle: 'normal'}} className={icons.getClassWithColor(file.name)}></i><span style={{paddingLeft: 5}}>{file.name}</span></FileContainer>
+              }}><i style={{fontStyle: 'normal'}} className={icons.getClassWithColor(file.name)}></i>
+              <span style={{paddingLeft: 5}}>
+                  {file.add === '' ? (!file.reName ? file.name :
+                    <input autoFocus={true} onBlur={handleReNameOnBlue} className='add-item-input' type='text'
+                           value={file.name} onChange={handleInputChange}/>) :
+                    <input autoFocus={true} onBlur={handleFileOnBlue} className='add-item-input' type='text'
+                           value={file.name} onChange={handleInputChange}/>}
+                  </span></FileContainer>
             }
             <div style={{display: file.expanded ? 'block' : 'none'}}>
-              {file.children.sort((a, b) => {return b.isDir - a.isDir}).map(f => <FileItem key={f} file={f}/>)}
+              {file.children.sort((a, b) => {
+                return b.isDir - a.isDir
+              }).map(f => <FileItem parentFile={file} key={f} file={f}/>)}
             </div>
           </Container>
         </ContextMenuTrigger>
         <ContextMenu id={file.path} className='menu'>
-          <MenuItem onClick={handleAddFileClick} data={{ item: 'item 1' }} attributes={{className :'menu-item-container'}}><IconFile style={{marginRight: '5px'}}/>添加文件</MenuItem>
-          <MenuItem onClick={handleAddFoldClick} data={{ item: 'item 2' }} attributes={{className :'menu-item-container'}}><IconFolder style={{marginRight: '5px'}}/>添加文件夹</MenuItem>
-          <MenuItem divider />
-          <MenuItem onClick={handleRenameClick} data={{ item: 'item 3' }} attributes={{className :'menu-item-container'}}><IconFaCircleONotch style={{marginRight: '5px'}}/>重命名</MenuItem>
-          <MenuItem onClick={handleDeleteClick} data={{ item: 'item 3' }} attributes={{className :'menu-item-container'}}><IconBucket style={{marginRight: '5px'}}/>删除文件</MenuItem>
+          <MenuItem onClick={handleAddFileClick} data={{item: 'item 1'}}
+                    attributes={{className: 'menu-item-container'}}><IconFile
+            style={{marginRight: '5px'}}/>添加文件</MenuItem>
+          <MenuItem onClick={handleAddFoldClick} data={{item: 'item 2'}}
+                    attributes={{className: 'menu-item-container'}}><IconFolder
+            style={{marginRight: '5px'}}/>添加文件夹</MenuItem>
+          <MenuItem divider/>
+          <MenuItem onClick={handleRenameClick} data={{item: 'item 3'}} attributes={{className: 'menu-item-container'}}><IconFaCircleONotch
+            style={{marginRight: '5px'}}/>重命名</MenuItem>
+          <MenuItem onClick={handleDeleteClick} data={{item: 'item 3'}} attributes={{className: 'menu-item-container'}}><IconBucket
+            style={{marginRight: '5px'}}/>删除文件</MenuItem>
         </ContextMenu>
 
       </div>

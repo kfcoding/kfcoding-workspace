@@ -5,8 +5,7 @@ import FileItem from "./FileItem";
 const FileTree = inject('store')(
     observer(({store}) => (
       <div style={{background: '#364040', height: '100%', color: '#fff' , overflow: 'scroll'}}>
-        <FileItem file={store.fileStore.root}/>
-
+        <FileItem parentFile={store.fileStore.root} file={store.fileStore.root}/>
       </div>
     ))
 )
