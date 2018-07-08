@@ -75,14 +75,9 @@ export const Store = types
     }
 
     function afterCreate() {
-      const url = document.location.toString().split("//")[1];
-      const id = url.split("/")[1]
+      const id = getQueryString('id');
       getWorkSpace(id).then(r => {
-        const containerName = r.data.result.workspace.containerName;
-        const postData = {name : containerName};
-        // 启动容器
-
-        fetch('http://aliapi.workspace.cloudwarehub.com/workspace/start', {
+        fetch('http://aliapi.workspace.cloudwarehub.com/workspace', {
           method: 'POST',
           mode: 'cors',
           headers: {
