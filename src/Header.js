@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import logo from './assets/logo-min.png';
 import IconSave from 'react-icons/lib/fa/floppy-o';
 import IconCommit from 'react-icons/lib/fa/upload';
+import IconRun from 'react-icons/lib/fa/play-circle'
 import { inject, observer } from "mobx-react/index";
 
 const styles = props =>
@@ -89,18 +90,28 @@ export const Action = styled.div`
 `;
 
 const Header = inject('store')(
-  observer(({store}) => (
-    <Container>
-      <Left>
-        <LogoContainer>
-          <img src={logo} style={{height: '100%'}}/>
-          <Title>KFCoding Workspace</Title>
-        </LogoContainer>
-        <Action title='保存' onClick={store.saveFiles}><IconSave/></Action>
-        <Action title='提交'><IconCommit/></Action>
-      </Left>
-    </Container>
-  ))
+  observer(({store}) => {
+    const handleRunClick = () => {
+      if (store.view.terminalIndex === -1){
+        store.createTerminal();
+      }
+      store.terminals[store.view.terminalIndex].exc();
+    }
+    return(
+      <Container>
+        <Left>
+          <LogoContainer>
+            <a target='_blank' href='http://kfcoding.com' style={{height: '100%'}}>
+              <img src={logo} style={{height: '100%'}}/>
+            </a>
+            <Title>KFCoding Workspace</Title>
+          </LogoContainer>
+          <Action title='保存' onClick={store.saveFiles}><IconSave/></Action>
+          <Action title='提交'><IconCommit/></Action>
+          <Action title='运行'><IconRun onClick={handleRunClick}/></Action>
+        </Left>
+      </Container>)
+  })
 )
 
 export default Header;

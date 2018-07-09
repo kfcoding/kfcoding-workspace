@@ -44,7 +44,13 @@ export const Terminal = types
       socket.emit('term.close', {id: self.id})
     }
 
+    function exc() {
+      var excInput = 'g++ main.cpp -o main && ./main\n'
+      socket.emit('term.input', {id: self.id, input: excInput})
+    }
+
     return {
+      exc,
       afterCreate,
       beforeDestroy
     }

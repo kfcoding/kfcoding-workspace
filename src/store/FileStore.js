@@ -57,6 +57,10 @@ export const File = types
       self.children.pop()
     }
 
+    function removeChildren(file) {
+      self.children.remove(file)
+    }
+
     function setExpanded(flag) {
       self.expanded = flag;
     }
@@ -103,6 +107,7 @@ export const File = types
       setChildren,
       pushChildren,
       popChildren,
+      removeChildren,
       setExpanded,
       toggleDir,
       open

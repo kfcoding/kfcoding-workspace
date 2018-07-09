@@ -58,12 +58,13 @@ const FileContainer = styled.div`
 const FileItem = inject('store')(
   observer(({parentFile, file, store}) => {
     const handleAddFileClick = (e, data) => {
-      const newFile = {
+      let newFile = {
         name: '',
         isDir: false,
         type: 'file',
         size: 0,
-        path: file.path + "/",
+        // path: file.path + "/",
+        path: file.path + '/',
         children: [],
         content: '',
         dirty: false,
@@ -75,6 +76,7 @@ const FileItem = inject('store')(
         const fn = () => {
           file.pushChildren(newFile)
         }
+        console.log(newFile.path);
         file.toggleDir(fn)
       } else {
         file.pushChildren(newFile)
@@ -83,17 +85,17 @@ const FileItem = inject('store')(
     }
 
     const handleAddFoldClick = (e, data) => {
-      const newFold = {
+      let newFold = {
         name: '',
         isDir: true,
         type: 'file',
         size: 0,
-        path: file.path + "/",
+        path: file.path + '/',
         children: [],
         content: '',
         dirty: false,
         expanded: false,
-        add: 'file',
+        add: 'fold',
         reName: false,
       }
       if (!file.expanded) {
@@ -113,8 +115,23 @@ const FileItem = inject('store')(
     const handleFileOnBlue = (event) => {
       if (event.target.value !== '') {
         const path = file.path + event.target.value;
+
+        let newFile = {
+          name: event.target.value,
+          isDir: false,
+          type: 'file',
+          size: 0,
+          path: path,
+          children: [],
+          content: '',
+          dirty: false,
+          expanded: false,
+          add: '',
+          reName: false,
+        }
         store.fileStore.writefile(path, '');
-        parentFile.loadChildren();
+        parentFile.removeChildren(file);
+        parentFile.pushChildren(newFile)
       } else {
         parentFile.popChildren()
       }
@@ -123,13 +140,26 @@ const FileItem = inject('store')(
     const handleDirOnBlue = (event) => {
       if (event.target.value !== '') {
         const path = file.path + event.target.value;
+        let newFold = {
+          name: event.target.value,
+          isDir: true,
+          type: 'file',
+          size: 0,
+          // path: file.path + "/",
+          path: path,
+          children: [],
+          content: '',
+          dirty: false,
+          expanded: false,
+          add: '',
+          reName: false,
+        }
         store.fileStore.mkdir(path);
-        // file.setPath(path);
-        file.setAdd('');
+        parentFile.removeChildren(file)
+        parentFile.pushChildren(newFold)
       } else {
         parentFile.popChildren()
       }
-      parentFile.loadChildren();
     }
 
     const handleReNameOnBlue = (event) => {
@@ -152,13 +182,12 @@ const FileItem = inject('store')(
     }
 
     const handleDeleteClick = (e, data) => {
-      debugger
       if (file.isDir) {
         store.fileStore.rmdir(file)
       } else {
         store.fileStore.unlink(file)
       }
-      parentFile.loadChildren();
+      parentFile.removeChildren(file);
     }
 
     const handleInputChange = (event) => {
