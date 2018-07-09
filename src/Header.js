@@ -99,7 +99,7 @@ const Header = inject('store')(
       if (store.view.terminalIndex === -1){
         store.createTerminal();
       }
-      store.terminals[store.view.terminalIndex].exc(file.name);
+      store.terminals[store.view.terminalIndex].exc(file.path);
     }
     return(
       <Container>
