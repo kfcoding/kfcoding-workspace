@@ -66,7 +66,7 @@ const FileItem = inject('store')(
         // path: file.path + "/",
         path: file.path + '/',
         children: [],
-        content: '',
+        content: file.content,
         dirty: false,
         expanded: false,
         add: 'file',
@@ -92,7 +92,7 @@ const FileItem = inject('store')(
         size: 0,
         path: file.path + '/',
         children: [],
-        content: '',
+        content: file.content,
         dirty: false,
         expanded: false,
         add: 'fold',
@@ -109,6 +109,7 @@ const FileItem = inject('store')(
     }
 
     const handleRenameClick = (e, data) => {
+      console.log(file.reName)
       file.setReName(true);
     }
 
@@ -123,7 +124,7 @@ const FileItem = inject('store')(
           size: 0,
           path: path,
           children: [],
-          content: '',
+          content: file.content,
           dirty: false,
           expanded: false,
           add: '',
@@ -145,10 +146,9 @@ const FileItem = inject('store')(
           isDir: true,
           type: 'file',
           size: 0,
-          // path: file.path + "/",
           path: path,
           children: [],
-          content: '',
+          content: file.content,
           dirty: false,
           expanded: false,
           add: '',
@@ -167,16 +167,28 @@ const FileItem = inject('store')(
         return;
       }
       if (event.target.value !== '') {
+
         const pathArray = file.path.split('/');
         var path = '';
-        if (file.isDir) {
-          pathArray[pathArray.length] = event.target.value;
-        } else {
-          pathArray[pathArray.length - 1] = event.target.value;
-        }
+        pathArray[pathArray.length - 1] = event.target.value;
         path = pathArray.toString();
         path = path.replace(/,/g, "/")
+        let newFile = {
+          name: event.target.value,
+          isDir: file.isDir,
+          type: file.Type,
+          size: 0,
+          path: path,
+          children: file.children,
+          content: file.content,
+          dirty: file.dirty,
+          expanded: file.expanded,
+          add: '',
+          reName: false,
+        }
         store.fileStore.rename(file, path);
+        parentFile.removeChildren(file);
+        parentFile.popChildren(newFile)
       }
       parentFile.loadChildren();
     }
@@ -209,7 +221,8 @@ const FileItem = inject('store')(
                   <IconFolder/>
                 }
                 <span style={{paddingLeft: 5}}>
-                  {file.add === '' ? file.name :
+                  {file.add === '' ? (!file.reName ? file.name : <input autoFocus={true} onBlur={handleReNameOnBlue} className='add-item-input' type='text'
+                                                                       value={file.name} onChange={handleInputChange}/>):
                     <input autoFocus={true} onBlur={handleDirOnBlue} className='add-item-input' type='text'
                            value={file.name} onChange={handleInputChange}/>}
                 </span></FileContainer>

@@ -145,7 +145,9 @@ export const FileStore = types
     }
 
     function rename(file, newPath) {
-      self.store.socket.emit('fs.rename', {oldPath: file.path, newPath: newPath});
+      self.store.socket.emit('fs.rename', {oldPath: file.path, newPath: newPath}, (data) => {
+        console.log(data)
+      });
     }
 
     function rmdir(file) {
