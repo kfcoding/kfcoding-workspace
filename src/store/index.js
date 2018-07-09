@@ -5,7 +5,7 @@ import * as fit from "xterm/lib/addons/fit/fit";
 import { ViewStore } from "./ViewStore";
 import { File, FileStore } from "./FileStore";
 import { getQueryString } from '../utils/common'
-import { getWorkSpace } from "../services/workspace";
+import { getWorkSpace , keepWorkSpace} from "../services/workspace";
 
 Xterm.applyAddon(fit);
 
@@ -44,8 +44,9 @@ export const Terminal = types
       socket.emit('term.close', {id: self.id})
     }
 
-    function exc() {
-      var excInput = 'g++ main.cpp -o main && ./main\n'
+    function exc(name) {
+      // var excInput = 'g++ main.cpp -o main && ./main\n'
+      var excInput = 'g++ ' + name + ' -o /tmp/'+name + ' && /tmp/'+name+'\n';
       socket.emit('term.input', {id: self.id, input: excInput})
     }
 
@@ -113,7 +114,6 @@ export const Store = types
           socket.on('connect', () => {
 
             self.view.setLoadingMsg('Preparing workspace...');
-
             socket.emit('workspace.init', {
               repo: repo,
             }, () => {
@@ -125,8 +125,12 @@ export const Store = types
               })
             })
           });
-        })
 
+          setInterval(() => {
+            keepWorkSpace(containerName)
+          }, 1000 * 60 * 2)
+
+        })
       })
 
     }

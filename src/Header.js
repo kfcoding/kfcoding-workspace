@@ -92,10 +92,14 @@ export const Action = styled.div`
 const Header = inject('store')(
   observer(({store}) => {
     const handleRunClick = () => {
+      if (store.view.editorIndex === -1)
+        return;
+      const file = store.openedFiles[store.view.editorIndex];
+      console.log(file.name)
       if (store.view.terminalIndex === -1){
         store.createTerminal();
       }
-      store.terminals[store.view.terminalIndex].exc();
+      store.terminals[store.view.terminalIndex].exc(file.name);
     }
     return(
       <Container>

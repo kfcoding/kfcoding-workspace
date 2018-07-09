@@ -14,3 +14,13 @@ export function createWorkSpace(data) {
 export function getWorkSpace(id) {
   return request(API + '/workspaces/'+id);
 }
+
+export function keepWorkSpace(name) {
+  return request('http://aliapi.workspace.cloudwarehub.com/workspace/keep', {
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    method: 'POST',
+    body: JSON.stringify({name : name})
+  })
+}

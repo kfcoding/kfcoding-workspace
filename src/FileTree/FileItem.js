@@ -29,30 +29,6 @@ const FileContainer = styled.div`
     background: rgba(108,174,221,0.1);
   }
 `;
-// const ContextMenu = styled.div`
-//   color: #ccc;
-//     background-color: #333;
-//     border-color: #3a3a3a;
-//     opacity: 0.95;
-//     position: absolute;
-//     z-index: 501;
-//     box-shadow: 0 4px 20px 1px rgba(0,0,0,0.3);
-//     border-radius: 4px;
-//     border: 1px solid transparent;
-//     padding: 4px 0;
-// `
-
-// class FileItem1 extends React.Component {
-//   render() {
-//     let {file} = this.props;
-//     return (
-//       <Container active={false}>
-//         <FileContainer onClick={file.loadChildren}><FileIcon size={16} extension="file" {...defaultStyles.txt} /> {this.props.file.name}</FileContainer>
-//         {file.children.map(f => <FileItem key={f} file={f}/>)}
-//       </Container>
-//     )
-//   }
-// }
 
 
 const FileItem = inject('store')(
@@ -66,7 +42,7 @@ const FileItem = inject('store')(
         // path: file.path + "/",
         path: file.path + '/',
         children: [],
-        content: file.content,
+        content: '',
         dirty: false,
         expanded: false,
         add: 'file',
@@ -124,7 +100,7 @@ const FileItem = inject('store')(
           size: 0,
           path: path,
           children: [],
-          content: file.content,
+          content: '',
           dirty: false,
           expanded: false,
           add: '',
@@ -167,8 +143,8 @@ const FileItem = inject('store')(
         return;
       }
       if (event.target.value !== '') {
-
         const pathArray = file.path.split('/');
+        console.log(pathArray)
         var path = '';
         pathArray[pathArray.length - 1] = event.target.value;
         path = pathArray.toString();
@@ -176,19 +152,19 @@ const FileItem = inject('store')(
         let newFile = {
           name: event.target.value,
           isDir: file.isDir,
-          type: file.Type,
+          type: file.type,
           size: 0,
           path: path,
           children: file.children,
           content: file.content,
           dirty: file.dirty,
-          expanded: file.expanded,
+          expanded: false,
           add: '',
           reName: false,
         }
         store.fileStore.rename(file, path);
-        parentFile.removeChildren(file);
-        parentFile.popChildren(newFile)
+        // parentFile.removeChildren(file);
+        // parentFile.pushChildren(newFile)
       }
       parentFile.loadChildren();
     }
