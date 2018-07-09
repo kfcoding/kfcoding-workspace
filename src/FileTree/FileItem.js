@@ -10,6 +10,7 @@ import IconBucket from 'react-icons/lib/fa/bitbucket';
 import IconFaCircleONotch from 'react-icons/lib/fa/circle-o-notch';
 import AddItem from './AddItem';
 import icons from 'file-icons-js';
+import mime from 'mime-types';
 
 const Container = styled.div`
   
@@ -96,7 +97,7 @@ const FileItem = inject('store')(
         let newFile = {
           name: event.target.value,
           isDir: false,
-          type: 'file',
+          type: mime.lookup(path) || 'file',
           size: 0,
           path: path,
           children: [],
@@ -162,6 +163,7 @@ const FileItem = inject('store')(
           add: '',
           reName: false,
         }
+        file.setType(mime.lookup(path) || 'file');
         store.fileStore.rename(file, path);
         // parentFile.removeChildren(file);
         // parentFile.pushChildren(newFile)

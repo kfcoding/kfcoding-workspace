@@ -37,6 +37,10 @@ export const File = types
       self.add = flag;
     }
 
+    function setType(type) {
+      self.type = type;
+    }
+
     function setDirty(flag) {
       self.dirty = flag;
     }
@@ -63,10 +67,6 @@ export const File = types
 
     function setExpanded(flag) {
       self.expanded = flag;
-    }
-
-    function setPath(path) {
-      self.path = path;
     }
 
     function loadChildren(fn) {
@@ -98,8 +98,8 @@ export const File = types
 
     return {
       setReName,
-      setPath,
       setName,
+      setType,
       setAdd,
       setDirty,
       setContent,
