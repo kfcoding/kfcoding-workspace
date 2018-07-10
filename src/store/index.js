@@ -101,8 +101,8 @@ export const Store = types
 
           self.view.setLoadingMsg('Connecting server...');
           /** connect socket **/
-          let socket = io('http://' + containerName + '.workspace.cloudwarehub.com');
-          // let socket = io('http://192.168.1.119:16999');
+          // let socket = io('http://' + containerName + '.workspace.cloudwarehub.com');
+          let socket = io('http://192.168.1.100:16999');
 
           self.setSocket(socket);
           // self.socket = socket;

@@ -106,9 +106,17 @@ const FileItem = inject('store')(
           add: '',
           reName: false,
         }
-        store.fileStore.writefile(path, '');
-        parentFile.removeChildren(file);
-        parentFile.pushChildren(newFile)
+        store.fileStore.isExist(path, (res) => {
+          if (!res.data)
+          {
+            store.fileStore.writefile(path, '');
+            parentFile.removeChildren(file);
+            parentFile.pushChildren(newFile)
+          } else {
+            alert('该文件已存在')
+            parentFile.popChildren()
+          }
+        })
       } else {
         parentFile.popChildren()
       }

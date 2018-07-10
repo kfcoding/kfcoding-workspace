@@ -69,11 +69,16 @@ export const File = types
       self.path = path;
     }
 
+
     function loadChildren(fn) {
-      self.store.socket.emit('fs.readdir', {path: self.path}, data => {
-        self.setChildren(data);
-        self.setExpanded(true);
-        fn && fn(data)
+      self.store.socket.emit('fs.readdir', {path: self.path}, res => {
+        if (!res.error) {
+          self.setChildren(res.data);
+          self.setExpanded(true);
+          fn && fn(res.data)
+        } else {
+          alert(res.error)
+        }
       })
     }
 
@@ -89,10 +94,15 @@ export const File = types
     }
 
     function open() {
-      self.store.socket.emit('fs.readfile', {path: self.path}, data => {
-        self.setContent(data);
-        self.store.pushOpenedFile(self);
-        self.store.view.setEditorIndex(self.store.openedFiles.length - 1);
+      self.store.socket.emit('fs.readfile', {path: self.path}, res => {
+        if (!res.error) {
+          self.setContent(res.data);
+          self.store.pushOpenedFile(self);
+          self.store.view.setEditorIndex(self.store.openedFiles.length - 1);
+        } else {
+          alert(res.error);
+        }
+
       })
     }
 
@@ -132,28 +142,37 @@ export const FileStore = types
 
     function mkdir(path) {
       self.store.socket.emit('fs.mkdir', {path: path}, (data) => {
-        if (data) alert(data)
+        if (data.error) alert(data.error)
       });
     }
 
+    // 判断是否重名
+    function isExist(path, fn) {
+      self.store.socket.emit('fs.checkfile', {path: path}, fn);
+    }
+
     function writefile(path, content) {
-      self.store.socket.emit('fs.writefile', {path: path, content: content || ''});
+      self.store.socket.emit('fs.writefile', {path: path, content: content || ''}, data => {
+        if (data.error) alert(data.error);
+      });
     }
 
     function unlink(file) {
-      self.store.socket.emit('fs.unlink', {path: file.path});
+      self.store.socket.emit('fs.unlink', {path: file.path}, (data) => {
+        if (data.error) alert(data.error);
+      });
     }
 
     function rename(file, newPath) {
       self.store.socket.emit('fs.rename', {oldPath: file.path, newPath: newPath}, (data) => {
-        console.log(data)
+        if (data.error) alert(data.error);
       });
     }
 
     function rmdir(file) {
       if (file.isDir) {
         self.store.socket.emit('fs.rmdir', {path: file.path}, (data) => {
-          if (data) alert(data)
+          if (data.error) alert(data.error)
         });
       }
     }
@@ -168,6 +187,7 @@ export const FileStore = types
     }
 
     return {
+      isExist,
       mkdir,
       writefile,
       unlink,
