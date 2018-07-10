@@ -138,9 +138,18 @@ const FileItem = inject('store')(
           add: '',
           reName: false,
         }
-        store.fileStore.mkdir(path);
-        parentFile.removeChildren(file)
-        parentFile.pushChildren(newFold)
+        store.fileStore.isExist(path, (res) => {
+          if (!res.data)
+          {
+            store.fileStore.mkdir(path);
+            parentFile.removeChildren(file)
+            parentFile.pushChildren(newFold)
+          } else {
+            alert('该文件夹已存在')
+            parentFile.popChildren()
+          }
+        })
+
       } else {
         parentFile.popChildren()
       }
@@ -170,7 +179,15 @@ const FileItem = inject('store')(
           add: '',
           reName: false,
         }
-        store.fileStore.rename(file, path);
+
+        store.fileStore.isExist(path, (res) => {
+          if (!res.data)
+          {
+            store.fileStore.rename(file, path);
+          } else {
+            alert('该文件夹已存在')
+          }
+        })
         // parentFile.removeChildren(file);
         // parentFile.pushChildren(newFile)
       }
