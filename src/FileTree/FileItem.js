@@ -221,19 +221,24 @@ const FileItem = inject('store')(
             </div>
           </Container>
         </ContextMenuTrigger>
-        <ContextMenu id={file.path} className='menu'>
-          <MenuItem onClick={handleAddFileClick} data={{item: 'item 1'}}
-                    attributes={{className: 'menu-item-container'}}><IconFile
-            style={{marginRight: '5px'}}/>添加文件</MenuItem>
-          <MenuItem onClick={handleAddFoldClick} data={{item: 'item 2'}}
-                    attributes={{className: 'menu-item-container'}}><IconFolder
-            style={{marginRight: '5px'}}/>添加文件夹</MenuItem>
-          <MenuItem divider/>
-          <MenuItem onClick={handleRenameClick} data={{item: 'item 3'}} attributes={{className: 'menu-item-container'}}><IconFaCircleONotch
-            style={{marginRight: '5px'}}/>重命名</MenuItem>
-          <MenuItem onClick={handleDeleteClick} data={{item: 'item 3'}} attributes={{className: 'menu-item-container'}}><IconBucket
-            style={{marginRight: '5px'}}/>删除文件</MenuItem>
-        </ContextMenu>
+
+        {file.path === '/workspace'?<div></div> :
+          <ContextMenu id={file.path} className='menu'>
+            <MenuItem onClick={handleAddFileClick} data={{item: 'item 1'}}
+                      attributes={{className: 'menu-item-container'}}><IconFile
+              style={{marginRight: '5px'}}/>添加文件</MenuItem>
+            <MenuItem onClick={handleAddFoldClick} data={{item: 'item 2'}}
+                      attributes={{className: 'menu-item-container'}}><IconFolder
+              style={{marginRight: '5px'}}/>添加文件夹</MenuItem>
+            <MenuItem divider/>
+            <MenuItem onClick={handleRenameClick} data={{item: 'item 3'}} attributes={{className: 'menu-item-container'}}><IconFaCircleONotch
+              style={{marginRight: '5px'}}/>重命名</MenuItem>
+            <MenuItem onClick={handleDeleteClick} data={{item: 'item 3'}} attributes={{className: 'menu-item-container'}}><IconBucket
+              style={{marginRight: '5px'}}/>删除文件</MenuItem>
+          </ContextMenu>
+        }
+
+
 
       </div>
     )
