@@ -159,7 +159,7 @@ const FileItem = inject('store')(
       if (!file.reName) {
         return;
       }
-      if (event.target.value !== '') {
+      if (event.target.value !== '' && file.name !== event.target.value) {
         const pathArray = file.path.split('/');
         console.log(pathArray)
         var path = '';
@@ -187,17 +187,20 @@ const FileItem = inject('store')(
           } else {
             alert('该文件夹已存在')
           }
+          parentFile.loadChildren();
         })
         // parentFile.removeChildren(file);
         // parentFile.pushChildren(newFile)
+      } else {
+        file.setReName(false)
       }
-      parentFile.loadChildren();
     }
 
     const handleDeleteClick = (e, data) => {
       if (file.isDir) {
         store.fileStore.rmdir(file)
       } else {
+        store.removeOpenedFile(file)
         store.fileStore.unlink(file)
       }
       parentFile.removeChildren(file);

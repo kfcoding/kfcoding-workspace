@@ -96,7 +96,11 @@ export const File = types
     function open() {
       self.store.socket.emit('fs.readfile', {path: self.path}, res => {
         if (!res.error) {
-          self.setContent(res.data);
+          let content = res.data;
+          if (!content){
+            content = res;
+          }
+          self.setContent(content);
           self.store.pushOpenedFile(self);
           self.store.view.setEditorIndex(self.store.openedFiles.length - 1);
         } else {
@@ -152,7 +156,7 @@ export const FileStore = types
     }
 
     function writefile(path, content) {
-      self.store.socket.emit('fs.writefile', {path: path, content: content || ''}, data => {
+      self.store.socket.emit('fs.writefile', {path: path, content: content || ''}, (data) => {
         if (data.error) alert(data.error);
       });
     }

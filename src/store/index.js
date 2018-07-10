@@ -186,7 +186,9 @@ export const Store = types
     function saveFiles(e) {
       e.preventDefault();
       self.openedFiles.map(f => {
-        self.socket.emit('fs.writefile', {path: f.path, content: f.content});
+        self.socket.emit('fs.writefile', {path: f.path, content: f.content}, (data) => {
+          if (data.error) alert(data.error)
+        });
         f.setDirty(false)
       })
     }
@@ -199,6 +201,10 @@ export const Store = types
       self.openedFiles.push(file)
     }
 
+    function removeOpenedFile(file) {
+      self.openedFiles.remove(file)
+    }
+
     return {
       setSocket,
       setRepo,
@@ -209,6 +215,7 @@ export const Store = types
       closeFile,
       saveFiles,
       hideBottom,
-      pushOpenedFile
+      pushOpenedFile,
+      removeOpenedFile
     }
   });
