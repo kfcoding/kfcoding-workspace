@@ -128,6 +128,16 @@ export const Store = types
             })
           });
 
+          socket.on('fs.reload', (data) => {
+            window.location.reload();
+          });
+
+          socket.on('fs.changed', (data) => {
+            if (data.option === 'remove') {
+
+            }
+          })
+
           setInterval(() => {
             keepWorkSpace(containerName)
           }, 1000 * 60 * 2)
