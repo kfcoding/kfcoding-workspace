@@ -117,12 +117,14 @@ export const Store = types
             socket.emit('workspace.init', {
               repo: repo,
             }, () => {
-              self.fileStore.root.loadChildren(() => {
-                self.view.setLoadingMsg('Completed! Happy coding~');
-                setTimeout(() => {
-                  self.view.setLoading(false);
-                }, 1500)
-              })
+              if (self.openedFiles.length === 0) {
+                self.fileStore.root.loadChildren(() => {
+                  self.view.setLoadingMsg('Completed! Happy coding~');
+                  setTimeout(() => {
+                    self.view.setLoading(false);
+                  }, 1500)
+                })
+              }
             })
           });
 
