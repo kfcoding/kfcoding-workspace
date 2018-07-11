@@ -73,7 +73,11 @@ export const File = types
     function loadChildren(fn) {
       self.store.socket.emit('fs.readdir', {path: self.path}, res => {
         if (!res.error) {
-          self.setChildren(res.data);
+          let content = res.data;
+          if (!content){
+            content = res;
+          }
+          self.setChildren(content);
           self.setExpanded(true);
           fn && fn(res.data)
         } else {
@@ -100,6 +104,7 @@ export const File = types
           if (!content){
             content = res;
           }
+          // self.store.removeOpenedFile(self);
           self.setContent(content);
           self.store.pushOpenedFile(self);
           self.store.view.setEditorIndex(self.store.openedFiles.length - 1);

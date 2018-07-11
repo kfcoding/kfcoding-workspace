@@ -116,15 +116,21 @@ export const Store = types
             self.view.setLoadingMsg('Preparing workspace...');
             socket.emit('workspace.init', {
               repo: repo,
-            }, () => {
-              if (self.openedFiles.length === 0) {
-                self.fileStore.root.loadChildren(() => {
-                  self.view.setLoadingMsg('Completed! Happy coding~');
-                  setTimeout(() => {
-                    self.view.setLoading(false);
-                  }, 1500)
-                })
+            }, (res) => {
+              console.log(res)
+              if (!res.error){
+                if (self.openedFiles.length === 0) {
+                  self.fileStore.root.loadChildren(() => {
+                    self.view.setLoadingMsg('Completed! Happy coding~');
+                    setTimeout(() => {
+                      self.view.setLoading(false);
+                    }, 1500)
+                  })
+                }
+              } else {
+                alert(res.error);
               }
+
             })
           });
 
