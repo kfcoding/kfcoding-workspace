@@ -95,7 +95,8 @@ const Header = inject('store')(
       if (store.view.editorIndex === -1)
         return;
       const file = store.openedFiles[store.view.editorIndex];
-      console.log(file.name)
+      store.fileStore.writefile(file.path, file.content);
+      // 创建terminal
       if (store.view.terminalIndex === -1){
         store.createTerminal();
       }

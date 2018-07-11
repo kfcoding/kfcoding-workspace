@@ -104,7 +104,7 @@ export const File = types
           if (!content){
             content = res;
           }
-          // self.store.removeOpenedFile(self);
+          self.store.removeOpenedFile(self);
           self.setContent(content);
           self.store.pushOpenedFile(self);
           self.store.view.setEditorIndex(self.store.openedFiles.length - 1);
