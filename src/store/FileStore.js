@@ -162,7 +162,9 @@ export const FileStore = types
 
     function writefile(path, content) {
       self.store.socket.emit('fs.writefile', {path: path, content: content || ''}, (data) => {
-        if (data.error) alert(data.error);
+        if (data) {
+          if (data.error) alert(data.error);
+        }
       });
     }
 
