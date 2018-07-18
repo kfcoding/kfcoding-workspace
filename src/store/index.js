@@ -1,11 +1,10 @@
-import { types, getParent, applyAction } from 'mobx-state-tree';
+import { types, getParent, flow } from 'mobx-state-tree';
 import { Terminal as Xterm } from 'xterm';
 import io from 'socket.io-client';
 import * as fit from "xterm/lib/addons/fit/fit";
 import { ViewStore } from "./ViewStore";
 import { File, FileStore } from "./FileStore";
-import { getQueryString } from '../utils/common'
-import { getWorkSpace , keepWorkSpace} from "../services/workspace";
+import { getWorkSpace, keepWorkSpace, startWorkspace, submitMyWork } from "../services/workspace";
 
 Xterm.applyAddon(fit);
 
@@ -65,7 +64,8 @@ export const Store = types
       files: []
     }),
     repo: '',
-    openedFiles: types.array(types.reference(File))
+    openedFiles: types.array(types.reference(File)),
+    workspace_id: types.string
   }).volatile(self => ({
     socket: null
   })).views(self => ({
@@ -83,25 +83,22 @@ export const Store = types
 
     function afterCreate() {
       const url = document.location.toString().split("//")[1];
-      const id = url.split("/")[1]
+      const id = url.split("/")[1];
+      self.workspace_id = id;
+
       getWorkSpace(id).then(r => {
         const containerName = r.data.result.workspace.containerName;
         const postData = {name : containerName};
         // 启动容器
+        startWorkspace(id).then(res => {
+          const wsAddr = res.data.result.socketAddr;
+          console.log(wsAddr);
 
-        fetch('http://aliapi.workspace.cloudwarehub.com/workspace/start', {
-          method: 'POST',
-          mode: 'cors',
-          headers: {
-            'content-type': 'application/json'
-          },
-          body: JSON.stringify(postData)
-        }).then(() => {
           const repo = r.data.result.workspace.gitUrl;
 
           self.view.setLoadingMsg('Connecting server...');
           /** connect socket **/
-          let socket = io('http://' + containerName + '.workspace.cloudwarehub.com');
+          let socket = io(wsAddr);
           // let socket = io('http://192.168.1.100:16999');
 
           self.setSocket(socket);
@@ -146,7 +143,7 @@ export const Store = types
 
           setInterval(() => {
             keepWorkSpace(containerName)
-          }, 1000 * 60 * 2)
+          }, 1000 * 60 * 3)
 
         })
       })
@@ -211,6 +208,18 @@ export const Store = types
       self.openedFiles.remove(file)
     }
 
+    var submitWork = flow(function* () {return;
+      if (!window.confirm('确定要提交吗？')) {
+        return;
+      }
+      try {
+        const result = yield submitMyWork(self.workspace_id);
+
+      } catch (err) {
+        console.log(err);
+      }
+    })
+
     return {
       setSocket,
       setRepo,
@@ -222,6 +231,7 @@ export const Store = types
       saveFiles,
       hideBottom,
       pushOpenedFile,
-      removeOpenedFile
+      removeOpenedFile,
+      submitWork
     }
   });

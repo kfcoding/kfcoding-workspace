@@ -11,15 +11,9 @@ import {Store} from "./store";
 const store = Store.create(
   {
     terminals: [],
-    files: [{
-      name: 'aaa',
-      path: '/aaa',
-      size: 123,
-      isDir: false,
-      type: 'text',
-      children: []
-    }],
-    openedFiles: []
+    files: [],
+    openedFiles: [],
+    workspace_id: ''
   }
 );
 

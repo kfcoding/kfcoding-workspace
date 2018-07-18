@@ -112,8 +112,8 @@ const Header = inject('store')(
             <Title>KFCoding Workspace</Title>
           </LogoContainer>
           <Action title='保存' onClick={store.saveFiles}><IconSave/></Action>
-          <Action title='提交'><IconCommit/></Action>
-          <Action title='运行'><IconRun onClick={handleRunClick}/></Action>
+          <Action title='提交' onClick={store.submitWork}><IconCommit/></Action>
+          <Action title='运行' onClick={handleRunClick}><IconRun/></Action>
         </Left>
       </Container>)
   })
