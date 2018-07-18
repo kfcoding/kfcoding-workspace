@@ -4,7 +4,8 @@ import io from 'socket.io-client';
 import * as fit from "xterm/lib/addons/fit/fit";
 import { ViewStore } from "./ViewStore";
 import { File, FileStore } from "./FileStore";
-import { getWorkSpace, keepWorkSpace, startWorkspace, submitMyWork } from "../services/workspace";
+import { getWork, getWorkSpace, keepWorkSpace, startWorkspace, submitMyWork } from "../services/workspace";
+import { Work } from "./Work";
 
 Xterm.applyAddon(fit);
 
@@ -65,7 +66,12 @@ export const Store = types
     }),
     repo: '',
     openedFiles: types.array(types.reference(File)),
-    workspace_id: types.string
+    workspace_id: types.string,
+    workId: types.string,
+    work: types.optional(Work, {
+      name: '',
+      description: ''
+    })
   }).volatile(self => ({
     socket: null
   })).views(self => ({
@@ -81,6 +87,14 @@ export const Store = types
       self.socket = socket;
     }
 
+    function setWorkId(id) {
+      self.workId = id;
+    }
+
+    function setWork(work) {
+      self.work = work;
+    }
+
     function afterCreate() {
       const url = document.location.toString().split("//")[1];
       const id = url.split("/")[1];
@@ -88,7 +102,17 @@ export const Store = types
 
       getWorkSpace(id).then(r => {
         const containerName = r.data.result.workspace.containerName;
-        const postData = {name : containerName};
+
+        if (r.data.result.submission && r.data.result.submission.workId) {
+          self.setWorkId(r.data.result.submission.workId);
+          getWork(r.data.result.submission.workId).then(res => {
+            console.log(res)
+            if (res.data.code == 200) {
+              self.setWork(res.data.result.work)
+            }
+          })
+        }
+
         // 启动容器
         startWorkspace(id).then(res => {
           const wsAddr = res.data.result.socketAddr;
@@ -121,7 +145,7 @@ export const Store = types
                     self.view.setLoadingMsg('Completed! Happy coding~');
                     setTimeout(() => {
                       self.view.setLoading(false);
-                    }, 1500)
+                    }, 1000)
                   })
                 }
               } else {
@@ -223,6 +247,7 @@ export const Store = types
     return {
       setSocket,
       setRepo,
+      setWorkId,
       afterCreate,
       createTerminal,
       removeTerminal,
@@ -232,6 +257,7 @@ export const Store = types
       hideBottom,
       pushOpenedFile,
       removeOpenedFile,
-      submitWork
+      submitWork,
+      setWork
     }
   });

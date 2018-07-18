@@ -13,7 +13,8 @@ const store = Store.create(
     terminals: [],
     files: [],
     openedFiles: [],
-    workspace_id: ''
+    workspace_id: '',
+    workId: ''
   }
 );
 

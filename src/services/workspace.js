@@ -33,3 +33,7 @@ export function startWorkspace(id) {
 export function submitMyWork(workspace_id) {
   return request(API + '/submissions/submit?workspace_id=' + workspace_id)
 }
+
+export function getWork(workId) {
+  return request(API + '/works/' + workId);
+}
