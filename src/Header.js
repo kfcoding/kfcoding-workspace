@@ -124,7 +124,7 @@ const Header = inject('store')(
         <Modal open={store.view.workOpen} onClose={store.view.hideWork} center>
           <div style={{width: '400px', minHeight: '250px'}}>
           <h3>{store.work.name}</h3>
-          <p>{store.work.description}</p>
+            <p><pre>{store.work.description}</pre></p>
           </div>
         </Modal>
       </Container>)
