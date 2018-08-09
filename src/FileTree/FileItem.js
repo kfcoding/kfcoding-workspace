@@ -159,7 +159,7 @@ const FileItem = inject('store')(
       if (!file.reName) {
         return;
       }
-      if (event.target.value !== '' && file.name !== event.target.value) {
+      if (event.target.value !== '') {
         const pathArray = file.path.split('/');
         console.log(pathArray)
         var path = '';
@@ -179,7 +179,6 @@ const FileItem = inject('store')(
           add: '',
           reName: false,
         }
-
         store.fileStore.isExist(path, (res) => {
           if (!res.data)
           {

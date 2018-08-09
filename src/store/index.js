@@ -1,11 +1,11 @@
-import { types, getParent, applyAction } from 'mobx-state-tree';
-import { Terminal as Xterm } from 'xterm';
+import {types, getParent, applyAction} from 'mobx-state-tree';
+import {Terminal as Xterm} from 'xterm';
 import io from 'socket.io-client';
 import * as fit from "xterm/lib/addons/fit/fit";
-import { ViewStore } from "./ViewStore";
-import { File, FileStore } from "./FileStore";
-import { getQueryString } from '../utils/common'
-import { getWorkSpace , keepWorkSpace} from "../services/workspace";
+import {ViewStore} from "./ViewStore";
+import {File, FileStore} from "./FileStore";
+import {getQueryString} from '../utils/common'
+import {getWorkSpace, startWorkSpace, keepWorkSpace} from "../services/workspace";
 
 Xterm.applyAddon(fit);
 
@@ -46,7 +46,15 @@ export const Terminal = types
 
     function exc(path) {
       // var excInput = 'g++ main.cpp -o main && ./main\n'
-      var excInput = 'g++ ' + path + ' -o /tmp/out.o && /tmp/out.o\n';
+      var excInput;
+      var array = path.split('.');
+      if (array[array.length - 1] === 'cpp') {
+        excInput = 'g++ ' + path + ' -o /tmp/out.o && /tmp/out.o\n';
+      } else if (array[array.length - 1] === 'py') {
+        excInput = 'python '+path + '\n';
+      } else {
+        alert("不是合法文件");
+      }
       socket.emit('term.input', {id: self.id, input: excInput})
     }
 
@@ -84,71 +92,60 @@ export const Store = types
     function afterCreate() {
       const url = document.location.toString().split("//")[1];
       const id = url.split("/")[1]
-      getWorkSpace(id).then(r => {
+      startWorkSpace(id).then(r => {
         const containerName = r.data.result.workspace.containerName;
-        const postData = {name : containerName};
-        // 启动容器
 
-        fetch('http://aliapi.workspace.cloudwarehub.com/workspace/start', {
-          method: 'POST',
-          mode: 'cors',
-          headers: {
-            'content-type': 'application/json'
-          },
-          body: JSON.stringify(postData)
-        }).then(() => {
-          const repo = r.data.result.workspace.gitUrl;
+        const repo = r.data.result.workspace.gitUrl;
 
-          self.view.setLoadingMsg('Connecting server...');
-          /** connect socket **/
-          let socket = io('http://' + containerName + '.workspace.cloudwarehub.com');
-          // let socket = io('http://192.168.1.100:16999');
+        self.view.setLoadingMsg('Connecting server...');
+        /** connect socket **/
+        let socket = io(r.data.result.workspace.wsaddr.workspace);
+        // let socket = io('http://192.168.1.100:16999');
 
-          self.setSocket(socket);
-          // self.socket = socket;
+        self.setSocket(socket);
+        // self.socket = socket;
 
-          socket.on('term.output', function(data) {
-            self.terminals.find(t => t.id === data.id).terminal.write(data.output)
-          });
-          /** fetch files **/
-          socket.on('connect', () => {
+        socket.on('term.output', function (data) {
+          self.terminals.find(t => t.id === data.id).terminal.write(data.output)
+        });
+        /** fetch files **/
+        socket.on('connect', () => {
 
-            self.view.setLoadingMsg('Preparing workspace...');
-            socket.emit('workspace.init', {
-              repo: repo,
-            }, (res) => {
-              console.log(res)
-              if (!res.error){
-                if (self.openedFiles.length === 0) {
-                  self.fileStore.root.loadChildren(() => {
-                    self.view.setLoadingMsg('Completed! Happy coding~');
-                    setTimeout(() => {
-                      self.view.setLoading(false);
-                    }, 1500)
-                  })
-                }
-              } else {
-                alert(res.error);
+          self.view.setLoadingMsg('Preparing workspace...');
+          socket.emit('workspace.init', {
+            repo: repo,
+          }, (res) => {
+            console.log(res)
+            if (!res.error) {
+              if (self.openedFiles.length === 0) {
+                self.fileStore.root.loadChildren(() => {
+                  self.view.setLoadingMsg('Completed! Happy coding~');
+                  setTimeout(() => {
+                    self.view.setLoading(false);
+                  }, 1500)
+                })
               }
-
-            })
-          });
-
-          socket.on('fs.reload', (data) => {
-            window.location.reload();
-          });
-
-          socket.on('fs.changed', (data) => {
-            if (data.option === 'remove') {
-
+            } else {
+              alert(res.error);
             }
+
           })
+        });
 
-          setInterval(() => {
-            keepWorkSpace(containerName)
-          }, 1000 * 60 * 2)
+        socket.on('fs.reload', (data) => {
+          window.location.reload();
+        });
 
+        socket.on('fs.changed', (data) => {
+          if (data.option === 'remove') {
+
+          }
         })
+
+        setInterval(() => {
+          keepWorkSpace(containerName)
+        }, 1000 * 60 * 1)
+
       })
 
     }
@@ -176,7 +173,7 @@ export const Store = types
       self.fileStore.readfile(file, () => {
       });
       self.openedFiles.push(file);
-      self.view.editorIndex = self.openedFiles.length -1;
+      self.view.editorIndex = self.openedFiles.length - 1;
       self.view.setCurrentFilePath(file.path);
     }
 
