@@ -74,12 +74,12 @@ export const Store = types
     }),
     repo: '',
     openedFiles: types.array(types.reference(File)),
-    workspace_id: types.string,
-    workId: types.string,
-    work: types.optional(Work, {
-      name: '',
-      description: ''
-    })
+    // workspace_id: types.string,
+    // workId: types.string,
+    // work: types.optional(Work, {
+    //   name: '',
+    //   description: ''
+    // })
   }).volatile(self => ({
     socket: null
   })).views(self => ({
@@ -213,23 +213,23 @@ export const Store = types
     function removeOpenedFile(file) {
       self.openedFiles.remove(file)
     }
-
-    var submitWork = flow(function* () {return;
-      if (!window.confirm('确定要提交吗？')) {
-        return;
-      }
-      try {
-        const result = yield submitMyWork(self.workspace_id);
-
-      } catch (err) {
-        console.log(err);
-      }
-    })
+    //
+    // var submitWork = flow(function* () {return;
+    //   if (!window.confirm('确定要提交吗？')) {
+    //     return;
+    //   }
+    //   try {
+    //     const result = yield submitMyWork(self.workspace_id);
+    //
+    //   } catch (err) {
+    //     console.log(err);
+    //   }
+    // })
 
     return {
       setSocket,
       setRepo,
-      setWorkId,
+      // setWorkId,
       afterCreate,
       createTerminal,
       removeTerminal,
