@@ -18,3 +18,15 @@ export function keepWorkSpace(name) {
     body: JSON.stringify({name : name, type : 'workspace'})
   })
 }
+
+export function startWorkspace(id) {
+  return request(API + '/workspaces/' + id + '/start');
+}
+
+export function submitMyWork(workspace_id) {
+  return request(API + '/submissions/submit?workspace_id=' + workspace_id)
+}
+
+export function getWork(workId) {
+  return request(API + '/works/' + workId);
+}

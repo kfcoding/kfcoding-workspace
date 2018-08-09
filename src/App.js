@@ -61,7 +61,7 @@ const App = inject('store')(
                 {/*</div>*/}
                 <Tabs selectedIndex={store.view.editorIndex} onSelect={tabIndex => store.view.setEditorIndex(tabIndex)} style={{background: '#1c2022', color: '#e0e0e0', height: '100%'}}>
                   <TabList>
-                    {store.openedFiles.map(t => <Tab key={t}><i style={{fontStyle: 'normal'}} className={icons.getClassWithColor(t.name)}></i> {t.name} <IconClose style={{marginLeft: '10px'}} onClick={(e) => {store.closeFile(t);e.stopPropagation()}}/></Tab>)}
+                    {store.openedFiles.map(t => <Tab key={t}><i style={{fontStyle: 'normal'}} className={icons.getClassWithColor(t.name)}></i> {t.dirty ? <b style={{color: 'red'}}>{t.name}</b> : t.name} <IconClose style={{marginLeft: '10px'}} onClick={(e) => {store.closeFile(t);e.stopPropagation()}}/></Tab>)}
                   </TabList>
                   {store.openedFiles.map(t => <TabPanel key={t} style={{height: 'calc(100% - 25px)', background: '#000'}}><MonacoEditor language={mimeToType(t.type)} value={t.content} options={editorOptions} file={t}/></TabPanel>)}
                 </Tabs>

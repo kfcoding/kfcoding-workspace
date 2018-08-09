@@ -3,8 +3,10 @@ import styled from 'styled-components';
 import logo from './assets/logo-min.png';
 import IconSave from 'react-icons/lib/fa/floppy-o';
 import IconCommit from 'react-icons/lib/fa/upload';
+import IconInfo from 'react-icons/lib/fa/info';
 import IconRun from 'react-icons/lib/fa/play-circle'
 import { inject, observer } from "mobx-react/index";
+import Modal from 'react-responsive-modal';
 
 const styles = props =>
   `
@@ -102,6 +104,7 @@ const Header = inject('store')(
       }
       store.terminals[store.view.terminalIndex].exc(file.path);
     }
+
     return(
       <Container>
         <Left>
@@ -112,9 +115,18 @@ const Header = inject('store')(
             <Title>KFCoding Workspace</Title>
           </LogoContainer>
           <Action title='保存' onClick={store.saveFiles}><IconSave/></Action>
-          <Action title='提交'><IconCommit/></Action>
-          <Action title='运行'><IconRun onClick={handleRunClick}/></Action>
+          {/*<Action title='提交' onClick={store.submitWork}><IconCommit/></Action>*/}
+          <Action title='运行' onClick={handleRunClick}><IconRun/></Action>
+          {store.workId &&
+          <Action title='查看作业' onClick={store.view.showWork}><IconInfo/></Action>}
         </Left>
+
+        <Modal open={store.view.workOpen} onClose={store.view.hideWork} center>
+          <div style={{width: '400px', minHeight: '250px'}}>
+          <h3>{store.work.name}</h3>
+            <p><pre>{store.work.description}</pre></p>
+          </div>
+        </Modal>
       </Container>)
   })
 )

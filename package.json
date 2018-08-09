@@ -49,6 +49,7 @@
     "react-icons": "^2.2.7",
     "react-loading-screen": "^0.0.17",
     "react-monaco-editor": "^0.17.2",
+    "react-responsive-modal": "^3.1.0",
     "react-sortable-tree": "^2.2.0",
     "react-sortable-tree-theme-file-explorer": "^1.1.2",
     "react-sortable-tree-theme-full-node-drag": "^1.1.0",

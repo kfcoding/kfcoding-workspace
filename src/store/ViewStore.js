@@ -8,7 +8,8 @@ export const ViewStore = types
     loading: true,
     loadingMsg: 'Loading...',
     bottomHeight: 30,
-    currentFilePath: ''
+    currentFilePath: '',
+    workOpen: false
   }).actions(self => ({
     setTerminalIndex(idx) {
       self.terminalIndex = idx;
@@ -27,5 +28,11 @@ export const ViewStore = types
     },
     setCurrentFilePath(path) {
       self.currentFilePath = path;
+    },
+    showWork() {
+      self.workOpen = true;
+    },
+    hideWork() {
+      self.workOpen = false;
     }
   }));
