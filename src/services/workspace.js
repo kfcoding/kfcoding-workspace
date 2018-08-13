@@ -10,13 +10,7 @@ export function startWorkSpace(id) {
 }
 
 export function keepWorkSpace(name) {
-  return request(API + '/workspace/keep', {
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    method: 'POST',
-    body: JSON.stringify({name : name, type : 'workspace'})
-  })
+  return request(API + '/workspaces/keep?'+ "containerName=" + name + "&type=workspace")
 }
 
 export function startWorkspace(id) {

@@ -1,11 +1,12 @@
-import {types, getParent, applyAction} from 'mobx-state-tree';
+import { types, getParent, flow } from 'mobx-state-tree';
 import {Terminal as Xterm} from 'xterm';
 import io from 'socket.io-client';
 import * as fit from "xterm/lib/addons/fit/fit";
 import {ViewStore} from "./ViewStore";
 import {File, FileStore} from "./FileStore";
 import {getQueryString} from '../utils/common'
-import {getWorkSpace, startWorkSpace, keepWorkSpace} from "../services/workspace";
+import {getWork, startWorkSpace, keepWorkSpace} from "../services/workspace";
+import { Work } from "./Work";
 
 Xterm.applyAddon(fit);
 
@@ -74,12 +75,12 @@ export const Store = types
     }),
     repo: '',
     openedFiles: types.array(types.reference(File)),
-    // workspace_id: types.string,
-    // workId: types.string,
-    // work: types.optional(Work, {
-    //   name: '',
-    //   description: ''
-    // })
+    workspace_id: types.string,
+    workId: types.string,
+    work: types.optional(Work, {
+      name: '',
+      description: ''
+    })
   }).volatile(self => ({
     socket: null
   })).views(self => ({
@@ -95,6 +96,14 @@ export const Store = types
       self.socket = socket;
     }
 
+    function setWorkId(id) {
+      self.workId = id;
+    }
+
+    function setWork(work) {
+      self.work = work;
+    }
+
     function afterCreate() {
       const url = document.location.toString().split("//")[1];
       const id = url.split("/")[1]
@@ -102,6 +111,16 @@ export const Store = types
         const containerName = r.data.result.workspace.containerName;
 
         const repo = r.data.result.workspace.gitUrl;
+
+        if (r.data.result.submission && r.data.result.submission.workId) {
+          self.setWorkId(r.data.result.submission.workId);
+          getWork(r.data.result.submission.workId).then(res => {
+            console.log(res)
+            if (res.data.code == 200) {
+              self.setWork(res.data.result.work)
+            }
+          })
+        }
 
         self.view.setLoadingMsg('Connecting server...');
         /** connect socket **/
@@ -128,7 +147,7 @@ export const Store = types
                   self.view.setLoadingMsg('Completed! Happy coding~');
                   setTimeout(() => {
                     self.view.setLoading(false);
-                  }, 1500)
+                  }, 1000)
                 })
               }
             } else {
@@ -213,7 +232,7 @@ export const Store = types
     function removeOpenedFile(file) {
       self.openedFiles.remove(file)
     }
-    //
+
     // var submitWork = flow(function* () {return;
     //   if (!window.confirm('确定要提交吗？')) {
     //     return;
@@ -229,7 +248,7 @@ export const Store = types
     return {
       setSocket,
       setRepo,
-      // setWorkId,
+      setWorkId,
       afterCreate,
       createTerminal,
       removeTerminal,

@@ -6,7 +6,7 @@ import IconCommit from 'react-icons/lib/fa/upload';
 import IconInfo from 'react-icons/lib/fa/info';
 import IconRun from 'react-icons/lib/fa/play-circle'
 import { inject, observer } from "mobx-react/index";
-// import Modal from 'react-responsive-modal';
+import Modal from 'react-responsive-modal';
 
 const styles = props =>
   `
@@ -121,12 +121,12 @@ const Header = inject('store')(
           <Action title='查看作业' onClick={store.view.showWork}><IconInfo/></Action>}
         </Left>
 
-        {/*<Modal open={store.view.workOpen} onClose={store.view.hideWork} center>*/}
-          {/*<div style={{width: '400px', minHeight: '250px'}}>*/}
-          {/*<h3>{store.work.name}</h3>*/}
-            {/*<p><pre>{store.work.description}</pre></p>*/}
-          {/*</div>*/}
-        {/*</Modal>*/}
+        <Modal open={store.view.workOpen} onClose={store.view.hideWork} center>
+          <div style={{width: '400px', minHeight: '250px'}}>
+          <h3>{store.work.name}</h3>
+            <p><pre>{store.work.description}</pre></p>
+          </div>
+        </Modal>
       </Container>)
   })
 )
