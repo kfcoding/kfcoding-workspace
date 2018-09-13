@@ -2,11 +2,11 @@ import React from 'react';
 import styled from 'styled-components';
 import logo from './assets/logo-min.png';
 import IconSave from 'react-icons/lib/fa/floppy-o';
-import IconCommit from 'react-icons/lib/fa/upload';
 import IconInfo from 'react-icons/lib/fa/info';
 import IconRun from 'react-icons/lib/fa/play-circle'
-import { inject, observer } from "mobx-react/index";
+import {inject, observer} from "mobx-react/index";
 import Modal from 'react-responsive-modal';
+import Upload from "./UploadFile/upload";
 
 const styles = props =>
   `
@@ -99,13 +99,13 @@ const Header = inject('store')(
       const file = store.openedFiles[store.view.editorIndex];
       store.fileStore.writefile(file.path, file.content);
       // 创建terminal
-      if (store.view.terminalIndex === -1){
+      if (store.view.terminalIndex === -1) {
         store.createTerminal();
       }
       store.terminals[store.view.terminalIndex].exc(file.path);
-    }
+    };
 
-    return(
+    return (
       <Container>
         <Left>
           <LogoContainer>
@@ -117,14 +117,17 @@ const Header = inject('store')(
           <Action title='保存' onClick={store.saveFiles}><IconSave/></Action>
           {/*<Action title='提交' onClick={store.submitWork}><IconCommit/></Action>*/}
           <Action title='运行' onClick={handleRunClick}><IconRun/></Action>
+          <Upload uploadUrl={store.upload.uploadUrl}/>
           {store.workId &&
           <Action title='查看作业' onClick={store.view.showWork}><IconInfo/></Action>}
         </Left>
 
         <Modal open={store.view.workOpen} onClose={store.view.hideWork} center>
           <div style={{width: '400px', minHeight: '250px'}}>
-          <h3>{store.work.name}</h3>
-            <p><pre>{store.work.description}</pre></p>
+            <h3>{store.work.name}</h3>
+            <p>
+              <pre>{store.work.description}</pre>
+            </p>
           </div>
         </Modal>
       </Container>)

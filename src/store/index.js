@@ -1,12 +1,12 @@
-import { types, getParent, flow } from 'mobx-state-tree';
+import {getParent, types} from 'mobx-state-tree';
 import {Terminal as Xterm} from 'xterm';
 import io from 'socket.io-client';
 import * as fit from "xterm/lib/addons/fit/fit";
 import {ViewStore} from "./ViewStore";
 import {File, FileStore} from "./FileStore";
-import {getQueryString} from '../utils/common'
-import {getWork, startWorkSpace, keepWorkSpace} from "../services/workspace";
-import { Work } from "./Work";
+import {getWork, keepWorkSpace, startWorkSpace} from "../services/workspace";
+import {Work} from "./Work";
+import {UploadStore} from "./UploadStore"
 
 Xterm.applyAddon(fit);
 
@@ -52,7 +52,7 @@ export const Terminal = types
       if (array[array.length - 1] === 'cpp') {
         excInput = 'g++ ' + path + ' -o /tmp/out.o && /tmp/out.o\n';
       } else if (array[array.length - 1] === 'py') {
-        excInput = 'python '+path + '\n';
+        excInput = 'python ' + path + '\n';
       } else {
         alert("不是合法文件");
       }
@@ -70,6 +70,7 @@ export const Store = types
   .model('Store', {
     view: types.optional(ViewStore, {}),
     terminals: types.array(Terminal),
+    upload: types.optional(UploadStore, {}),
     fileStore: types.optional(FileStore, {
       files: []
     }),
@@ -106,7 +107,7 @@ export const Store = types
 
     function afterCreate() {
       const url = document.location.toString().split("//")[1];
-      const id = url.split("/")[1]
+      const id = url.split("/")[1];
       startWorkSpace(id).then(r => {
         const containerName = r.data.result.workspace.containerName;
 
@@ -115,8 +116,8 @@ export const Store = types
         if (r.data.result.submission && r.data.result.submission.workId) {
           self.setWorkId(r.data.result.submission.workId);
           getWork(r.data.result.submission.workId).then(res => {
-            console.log(res)
-            if (res.data.code == 200) {
+            console.log(res);
+            if (res.data.code === 200) {
               self.setWork(res.data.result.work)
             }
           })
@@ -124,8 +125,12 @@ export const Store = types
 
         self.view.setLoadingMsg('Connecting server...');
         /** connect socket **/
+          // let socket = io('http://localhost:16999');
         let socket = io(r.data.result.workspace.wsaddr.workspace);
-        // let socket = io('http://192.168.1.100:16999');
+
+        let uploadAddr = r.data.result.workspace.wsaddr.workspace;
+        // let uploadAddr = 'http://localhost:16999';
+        self.upload.setUploadUrl(uploadAddr + '/upload');
 
         self.setSocket(socket);
         // self.socket = socket;
@@ -140,7 +145,7 @@ export const Store = types
           socket.emit('workspace.init', {
             repo: repo,
           }, (res) => {
-            console.log(res)
+            console.log(res);
             if (!res.error) {
               if (self.openedFiles.length === 0) {
                 self.fileStore.root.loadChildren(() => {
@@ -165,7 +170,7 @@ export const Store = types
           if (data.option === 'remove') {
 
           }
-        })
+        });
 
         setInterval(() => {
           keepWorkSpace(containerName)
